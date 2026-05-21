@@ -1,0 +1,16 @@
+# Angular
+frontend/frontend-app/node_modules
+frontend/frontend-app/.angular
+frontend/frontend-app/dist
+
+# Python
+backend/venv
+backend/__pycache__
+*.pyc
+
+# VSCode
+.vscode/
+
+# Sistema
+.DS_Store
+Thumbs.db
