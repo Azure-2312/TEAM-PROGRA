@@ -1,0 +1,48 @@
+1. Preparación (Solo se hace una vez)
+    Antes de enviar código, Git necesita saber quién eres para marcar tus "commits" (tus cambios).
+
+    Descarga e instala Git: Si no lo tienes, bájalo de git-scm.com.
+
+    Configura tu identidad: Abre una terminal (o Git Bash) y escribe:
+
+        git config --global user.name "Tu Nombre"
+
+        git config --global user.email "tu-email@ejemplo.com" (Usa el mismo que tienes en GitHub).
+
+2. Preparar tu carpeta local
+    Imagina que tienes una carpeta en tu PC con los archivos de tu proyecto (por ejemplo, tus prácticas de Java o Flutter).
+
+    Abre la terminal dentro de esa carpeta.
+
+    Inicia Git:
+        git init
+    Esto crea una carpeta oculta .git que empezará a rastrear tus cambios.
+
+3. El flujo de trabajo (Paso a paso)
+    Aquí es donde ocurre la magia. El proceso sigue este orden lógico:
+
+    Paso A: Ver qué archivos han cambiado
+        it status
+    Verás los archivos en rojo. Eso significa que Git sabe que están ahí, pero aún no los está "siguiendo".
+
+    Paso B: Añadir archivos al área de preparación (Staging)
+        git add .
+    El punto (.) significa que quieres añadir todo y si deseas solo un archivos "poner aqui el nombre y extension del archivo". Si haces git status ahora, verás los nombres en verde.
+
+    Paso C: Crear el commit (La foto de tu código)
+        git commit -m "Mi primer commit: estructura inicial del proyecto"
+    El mensaje entre comillas debe ser descriptivo. Esto guarda los cambios en tu base de datos local.
+
+4. Subir a GitHub
+    Ahora necesitas enviar eso que guardaste en tu PC a la nube de GitHub.
+
+    Crea un repositorio en GitHub: Ve a tu perfil, dale a "New repository", ponle un nombre y dale a "Create".
+
+    Conecta tu PC con GitHub: Copia la URL que te da GitHub (termina en .git) y pégala aquí:
+        git remote add origin https://github.com/tu-usuario/tu-repo.git
+    
+    Sube los cambios:
+        git branch -M main
+        git push -u origin main
+
+Nota importante: La primera vez que hagas el push, te saltará una ventana pidiendo que inicies sesión en GitHub para confirmar que eres tú.
