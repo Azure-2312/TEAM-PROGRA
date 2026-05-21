@@ -1,0 +1,97 @@
+<section class="reports-page">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="/assets/images/logo-cacao.png" alt="Logo" />
+      <span>CacaoDetect</span>
+    </div>
+
+    <nav class="menu">
+      <a routerLink="/dashboard">Dashboard</a>
+      <a routerLink="/analyze">Analizar cacao</a>
+      <a routerLink="/history">Historial</a>
+      <a class="active" routerLink="/reports">Reportes</a>
+      <a routerLink="/profile">Perfil</a>
+    </nav>
+
+    <a class="logout" routerLink="/login">Cerrar sesión</a>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div>
+        <h1>Reportes y estadísticas</h1>
+
+        <div class="date-filter">
+          <span>Rango de fechas</span>
+          <select>
+            <option>10/05/2024 - 16/05/2024</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="export-btn">Exportar</button>
+    </header>
+
+    <section class="stats">
+      <div class="stat-card">
+        <span>Total análisis</span>
+        <h2>152</h2>
+      </div>
+
+      <div class="stat-card green">
+        <span>● Cacao sano</span>
+        <h2>78 <small>(51.3%)</small></h2>
+      </div>
+
+      <div class="stat-card red">
+        <span>● Con podredumbre</span>
+        <h2>45 <small>(29.6%)</small></h2>
+      </div>
+
+      <div class="stat-card orange">
+        <span>● Con parásitos</span>
+        <h2>29 <small>(19.1%)</small></h2>
+      </div>
+    </section>
+
+    <section class="charts-grid">
+      <div class="chart-card">
+        <h3>Distribución de resultados</h3>
+
+        <div class="pie-area">
+          <div class="pie-chart"></div>
+
+          <div class="legend">
+            <p><span class="dot green-dot"></span>Sano (51.3%)</p>
+            <p><span class="dot red-dot"></span>Con podredumbre (29.6%)</p>
+            <p><span class="dot orange-dot"></span>Con parásitos (19.1%)</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3>Análisis por fecha</h3>
+
+        <div class="bar-chart">
+          <div style="height: 35%"></div>
+          <div style="height: 58%"></div>
+          <div style="height: 52%"></div>
+          <div style="height: 86%"></div>
+          <div style="height: 65%"></div>
+          <div style="height: 52%"></div>
+          <div style="height: 78%"></div>
+        </div>
+
+        <div class="chart-dates">
+          <span>10 May</span>
+          <span>11 May</span>
+          <span>12 May</span>
+          <span>13 May</span>
+          <span>14 May</span>
+          <span>15 May</span>
+          <span>16 May</span>
+        </div>
+      </div>
+    </section>
+  </main>
+</section>

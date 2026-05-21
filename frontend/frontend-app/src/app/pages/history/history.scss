@@ -1,0 +1,164 @@
+.history-page {
+  width: 100%;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  background: #f5f5f3;
+  overflow: hidden;
+}
+
+.sidebar {
+  background: linear-gradient(180deg, #21170f 0%, #37251a 100%);
+  color: white;
+  padding: 24px 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 34px;
+
+  img {
+    width: 42px;
+    height: 42px;
+  }
+
+  span {
+    font-size: 18px;
+    font-weight: 800;
+  }
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  a {
+    color: white;
+    text-decoration: none;
+    padding: 12px 16px;
+    border-radius: 9px;
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  a.active,
+  a:hover {
+    background: #3f8f36;
+  }
+}
+
+.logout {
+  margin-top: auto;
+  color: white;
+  text-decoration: none;
+  padding: 12px 16px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.main-content {
+  padding: 40px 42px;
+  overflow: hidden;
+
+  h1 {
+    font-size: 34px;
+    font-weight: 900;
+    color: #222;
+    margin-bottom: 28px;
+  }
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 28px;
+  margin-bottom: 34px;
+
+  input,
+  select {
+    width: 100%;
+    height: 54px;
+    border: 2px solid #e4e4e4;
+    border-radius: 10px;
+    background: white;
+    padding: 0 18px;
+    font-size: 16px;
+    color: #666;
+    outline: none;
+  }
+}
+
+.table-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #ffffff;
+}
+
+th {
+  text-align: left;
+  padding: 18px 28px;
+  font-size: 16px;
+  color: #555;
+  border-bottom: 2px solid #eeeeee;
+}
+
+td {
+  padding: 16px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #eeeeee;
+}
+
+td img {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.status {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.status.green {
+  background: #2f8a2c;
+}
+
+.status.red {
+  background: #d83a34;
+}
+
+.status.orange {
+  background: #f28c1b;
+}
+
+/* CLICK EN FILAS */
+
+.clickable-row {
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.clickable-row:hover {
+  background: #f7f7f5;
+}

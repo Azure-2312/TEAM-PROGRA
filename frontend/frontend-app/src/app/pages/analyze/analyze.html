@@ -1,0 +1,72 @@
+<section class="analyze-page">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="/assets/images/logo-cacao.png" alt="Logo" />
+      <span>CacaoDetect</span>
+    </div>
+
+    <nav class="menu">
+      <a routerLink="/dashboard">Dashboard</a>
+      <a class="active" routerLink="/analyze">Analizar cacao</a>
+      <a routerLink="/history">Historial</a>
+      <a routerLink="/reports">Reportes</a>
+      <a routerLink="/profile">Perfil</a>
+    </nav>
+
+    <a class="logout" routerLink="/login">Cerrar sesión</a>
+  </aside>
+
+  <main class="main-content">
+    <header class="page-header">
+      <h1>Analizar nuevo cacao</h1>
+      <p>Sube una imagen para detectar el estado del cacao</p>
+    </header>
+
+    <section class="analyze-grid">
+      <div class="upload-section">
+        <h2>Imagen del cacao</h2>
+
+        <div class="upload-box">
+          <div class="upload-icon">☁</div>
+          <strong>Arrastra tu imagen aquí</strong>
+          <span>o haz clic para seleccionar</span>
+          <small>(JPG, PNG, máx. 10MB)</small>
+        </div>
+
+        <img
+            class="preview-image"
+            src="/assets/analyze/cacao-preview.png"
+            alt="Vista previa cacao"
+        />
+      </div>
+
+      <div class="result-section">
+        <div class="result-card">
+          <h2>Resultado</h2>
+
+          <div class="result-content">
+            <div class="check-icon">✓</div>
+
+            <div>
+              <h3>Sano</h3>
+              <p>96% de confianza</p>
+            </div>
+          </div>
+
+          <div class="progress">
+            <div></div>
+          </div>
+        </div>
+
+        <div class="recommendation-card">
+          <h2>Recomendación</h2>
+
+          <p>Producto apto visualmente.</p>
+          <p>El cacao se encuentra en buen estado.</p>
+
+          <button>Nuevo análisis</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</section>

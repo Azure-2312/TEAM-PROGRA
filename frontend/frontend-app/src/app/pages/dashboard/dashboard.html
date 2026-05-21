@@ -1,0 +1,111 @@
+<section class="dashboard-page">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="/assets/images/logo-cacao.png" alt="Logo" />
+      <span>CacaoDetect</span>
+    </div>
+
+    <nav class="menu">
+      <a class="active" routerLink="/dashboard">Dashboard</a>
+      <a routerLink="/analyze" routerLinkActive="active">Analizar cacao</a>
+      <a routerLink="/history">Historial</a>
+      <a routerLink="/reports">Reportes</a>
+      <a routerLink="/profile">Perfil</a>
+    </nav>
+
+    <a class="logout" routerLink="/login">Cerrar sesión</a>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div>
+        <h1>Hola, Piero Montalvo 👋</h1>
+        <p>Resumen general de tus análisis</p>
+      </div>
+
+      <button routerLink="/analyze">Analizar nuevo cacao</button>
+    </header>
+
+    <section class="stats">
+      <div class="stat-card">
+        <span>Total análisis</span>
+        <h2>152</h2>
+      </div>
+
+      <div class="stat-card green">
+        <span>Cacao sano</span>
+        <h2>78</h2>
+        <small>51.3%</small>
+      </div>
+
+      <div class="stat-card red">
+        <span>Con podredumbre</span>
+        <h2>45</h2>
+        <small>29.6%</small>
+      </div>
+
+      <div class="stat-card orange">
+        <span>Con parásitos</span>
+        <h2>29</h2>
+        <small>19.1%</small>
+      </div>
+    </section>
+
+    <section class="dashboard-grid">
+      <div class="chart-card">
+        <h3>Análisis por fecha</h3>
+
+        <div class="fake-chart">
+          <div style="height: 45%"></div>
+          <div style="height: 38%"></div>
+          <div style="height: 55%"></div>
+          <div style="height: 72%"></div>
+          <div style="height: 48%"></div>
+          <div style="height: 60%"></div>
+          <div style="height: 82%"></div>
+        </div>
+
+        <div class="chart-dates">
+          <span>10 May</span>
+          <span>11 May</span>
+          <span>12 May</span>
+          <span>13 May</span>
+          <span>14 May</span>
+          <span>15 May</span>
+          <span>16 May</span>
+        </div>
+      </div>
+
+      <div class="recent-card">
+        <h3>Últimos análisis</h3>
+
+        <div class="analysis-item">
+          <img src="/assets/home/home-bg.png" alt="Cacao" />
+          <div>
+            <strong>Cacao_2024_05_16_01</strong>
+            <p class="green-text">● Sano</p>
+            <small>16/05/2024 10:00 a.m.</small>
+          </div>
+        </div>
+
+        <div class="analysis-item">
+          <img src="/assets/home/home-bg.png" alt="Cacao" />
+          <div>
+            <strong>Cacao_2024_05_16_02</strong>
+            <p class="red-text">● Con podredumbre</p>
+            <small>16/05/2024 09:45 a.m.</small>
+          </div>
+        </div>
+
+        <div class="analysis-item">
+          <img src="/assets/home/home-bg.png" alt="Cacao" />
+          <div>
+            <strong>Cacao_2024_05_16_03</strong>
+            <p class="orange-text">● Con parásitos</p>
+            <small>16/05/2024 08:15 a.m.</small>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</section>
