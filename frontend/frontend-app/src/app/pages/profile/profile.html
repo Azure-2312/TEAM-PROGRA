@@ -1,25 +1,9 @@
 <section class="profile-page">
-  <aside class="sidebar">
-    <div class="brand">
-      <img src="/assets/images/logo-cacao.png" alt="Logo" />
-      <span>CacaoDetect</span>
-    </div>
-
-    <nav class="menu">
-      <a routerLink="/dashboard">Dashboard</a>
-      <a routerLink="/analyze">Analizar cacao</a>
-      <a routerLink="/history">Historial</a>
-      <a routerLink="/reports">Reportes</a>
-      <a class="active" routerLink="/profile">Perfil</a>
-    </nav>
-
-    <a class="logout" routerLink="/login">Cerrar sesión</a>
-  </aside>
+  <app-sidebar></app-sidebar>
 
   <main class="main-content">
     <section class="profile-card">
       <h1>Mi perfil</h1>
-
       <div class="avatar-box">
         <img src="/assets/profile/user-profile.png" alt="Usuario" />
         <button>📷</button>

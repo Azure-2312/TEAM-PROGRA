@@ -1,94 +1,21 @@
 .analyze-page {
   width: 100%;
-  height: 100vh;
-
+  min-height: 100vh;
   display: grid;
   grid-template-columns: 220px 1fr;
-
   background: #f5f5f3;
-  overflow: hidden;
-}
-
-.sidebar {
-  background: linear-gradient(180deg, #21170f 0%, #37251a 100%);
-  color: white;
-  padding: 24px 18px;
-  display: flex;
-  flex-direction: column;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 34px;
-
-  img {
-    width: 42px;
-    height: 42px;
-  }
-
-  span {
-    font-size: 18px;
-    font-weight: 800;
-  }
-}
-
-.menu {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  a {
-    color: white;
-    text-decoration: none;
-    padding: 12px 16px;
-    border-radius: 9px;
-    font-weight: 700;
-    font-size: 15px;
-  }
-
-  a.active,
-  a:hover {
-    background: #3f8f36;
-  }
-}
-
-.logout {
-  margin-top: auto;
-  color: white;
-  text-decoration: none;
-  padding: 12px 16px;
-  font-weight: 700;
-  font-size: 15px;
+  overflow-y: auto;
 }
 
 .main-content {
-  padding: 36px 44px;
-  overflow: hidden;
-}
-
-.page-header {
-  margin-bottom: 10px;
-
-  h1 {
-    font-size: 34px;
-    font-weight: 900;
-    color: #222;
-  }
-
-  p {
-    margin-top: 6px;
-    font-size: 16px;
-    color: #777;
-  }
+  padding: 36px 44px 90px;
+  overflow: visible;
 }
 
 .analyze-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
-
   align-items: start;
 }
 
@@ -100,156 +27,77 @@
   }
 }
 
-.upload-box {
-  height: 150px;
-  border: 2px dashed #d8d8d8;
-  border-radius: 16px;
-  background: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #777;
-  margin-bottom: 15px;
-}
-
-.upload-icon {
-  font-size: 50px;
-  color: #8c8c8c;
-  margin-bottom: -15px;
-}
-
-.upload-box strong {
-  font-size: 17px;
-  color: #555;
-}
-
-.upload-box span {
-  margin-top: 1px;
-  font-size: 14px;
-}
-
-.upload-box small {
-  margin-top: 8px;
-  font-size: 12px;
-  color: #999;
-}
-
 .preview-image {
   width: 100%;
-  height: 325px;
+  height: 400px;
   object-fit: cover;
-
   border-radius: 16px;
+  margin-top: 14px;
 }
 
 .result-section {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 16px;
 }
 
-.result-card,
-.recommendation-card {
-  background: white;
+.analyze-btn {
+  width: 100%;
+  height: 56px;
 
-  border-radius: 18px;
+  margin-top: 14px;
 
-  padding: 34px;
+  border: none;
+  border-radius: 12px;
 
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-}
-
-.result-card {
-  height: 220px;
-}
-
-.result-card h2,
-.recommendation-card h2 {
-  font-size: 22px;
-  color: #222;
-  margin-bottom: 28px;
-}
-
-.result-content {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-}
-
-.check-icon {
-  width: 92px;
-  height: 92px;
-
-  border-radius: 50%;
-
-  background: #3f8f36;
+  background: #347d2b;
   color: white;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  font-size: 56px;
+  font-size: 18px;
   font-weight: 800;
+
+  cursor: pointer;
+
+  transition: 0.2s;
 }
 
-.result-content h3 {
-  font-size: 52px;
-  color: #3f8f36;
-  font-weight: 900;
+.analyze-btn:hover {
+  background: #2d6d25;
 }
 
-.result-content p {
-  margin-top: 8px;
-  font-size: 24px;
-  font-weight: 700;
-  color: #333;
+
+.preview-card {
+  margin-top: 14px;
 }
 
-.progress {
-  width: 100%;
-  height: 12px;
-
-  background: #e6e6e6;
-
-  border-radius: 20px;
-
-  margin-top: 42px;
-
-  overflow: hidden;
+.preview-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
 }
 
-.progress div {
-  width: 96%;
-  height: 100%;
+.change-btn,
+.analyze-btn {
+  height: 54px;
 
-  background: #3f8f36;
+  border: none;
+  border-radius: 12px;
+
+  font-size: 17px;
+  font-weight: 800;
+
+  cursor: pointer;
 }
 
-.recommendation-card {
+.change-btn {
+  margin-top: 14px;
+  background: white;
+  color: #347d2b;
+  border: 2px solid #347d2b;
+}
 
-  p {
-    font-size: 18px;
-    color: #555;
-    line-height: 1.7;
-  }
-
-  button {
-    width: 100%;
-    height: 58px;
-
-    margin-top: 34px;
-
-    background: #347d2b;
-    color: white;
-
-    border: none;
-    border-radius: 12px;
-
-    font-size: 18px;
-    font-weight: 800;
-
-    cursor: pointer;
-  }
+.analyze-btn {
+  background: #347d2b;
+  color: white;
 }

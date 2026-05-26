@@ -1,60 +1,47 @@
 <section class="dashboard-page">
-  <aside class="sidebar">
-    <div class="brand">
-      <img src="/assets/images/logo-cacao.png" alt="Logo" />
-      <span>CacaoDetect</span>
-    </div>
-
-    <nav class="menu">
-      <a class="active" routerLink="/dashboard">Dashboard</a>
-      <a routerLink="/analyze" routerLinkActive="active">Analizar cacao</a>
-      <a routerLink="/history">Historial</a>
-      <a routerLink="/reports">Reportes</a>
-      <a routerLink="/profile">Perfil</a>
-    </nav>
-
-    <a class="logout" routerLink="/login">Cerrar sesión</a>
-  </aside>
+  <app-sidebar></app-sidebar>
 
   <main class="main-content">
-    <header class="topbar">
-      <div>
-        <h1>Hola, Piero Montalvo 👋</h1>
-        <p>Resumen general de tus análisis</p>
-      </div>
+    <app-page-header
+      title="Hola, Piero Montalvo 👋"
+      subtitle="Resumen general de tus análisis">
 
-      <button routerLink="/analyze">Analizar nuevo cacao</button>
-    </header>
+      <button actions routerLink="/analyze">
+        Analizar nuevo cacao
+      </button>
+
+    </app-page-header>
 
     <section class="stats">
-      <div class="stat-card">
-        <span>Total análisis</span>
-        <h2>152</h2>
-      </div>
+      <app-stat-card
+        title="Total análisis"
+        value="152">
+      </app-stat-card>
 
-      <div class="stat-card green">
-        <span>Cacao sano</span>
-        <h2>78</h2>
-        <small>51.3%</small>
-      </div>
+      <app-stat-card
+        title="Cacao sano"
+        value="78"
+        subtitle="51.3%"
+        color="green">
+      </app-stat-card>
 
-      <div class="stat-card red">
-        <span>Con podredumbre</span>
-        <h2>45</h2>
-        <small>29.6%</small>
-      </div>
+      <app-stat-card
+        title="Con podredumbre"
+        value="45"
+        subtitle="29.6%"
+        color="red">
+      </app-stat-card>
 
-      <div class="stat-card orange">
-        <span>Con parásitos</span>
-        <h2>29</h2>
-        <small>19.1%</small>
-      </div>
+      <app-stat-card
+        title="Con parásitos"
+        value="29"
+        subtitle="19.1%"
+        color="orange">
+      </app-stat-card>
     </section>
 
     <section class="dashboard-grid">
-      <div class="chart-card">
-        <h3>Análisis por fecha</h3>
-
+      <app-chart-card title="Análisis por fecha">
         <div class="fake-chart">
           <div style="height: 45%"></div>
           <div style="height: 38%"></div>
@@ -74,38 +61,35 @@
           <span>15 May</span>
           <span>16 May</span>
         </div>
-      </div>
+      </app-chart-card>
 
-      <div class="recent-card">
-        <h3>Últimos análisis</h3>
+      <app-chart-card title="Últimos análisis">
+        <div class="recent-list">
+          <app-analysis-item
+            image="/assets/home/home-bg.png"
+            title="Cacao_2024_05_16_01"
+            result="Sano"
+            date="16/05/2024 10:00 a.m."
+            color="green">
+          </app-analysis-item>
 
-        <div class="analysis-item">
-          <img src="/assets/home/home-bg.png" alt="Cacao" />
-          <div>
-            <strong>Cacao_2024_05_16_01</strong>
-            <p class="green-text">● Sano</p>
-            <small>16/05/2024 10:00 a.m.</small>
-          </div>
+          <app-analysis-item
+            image="/assets/home/home-bg.png"
+            title="Cacao_2024_05_16_02"
+            result="Con podredumbre"
+            date="16/05/2024 09:45 a.m."
+            color="red">
+          </app-analysis-item>
+
+          <app-analysis-item
+            image="/assets/home/home-bg.png"
+            title="Cacao_2024_05_16_03"
+            result="Con parásitos"
+            date="16/05/2024 08:15 a.m."
+            color="orange">
+          </app-analysis-item>
         </div>
-
-        <div class="analysis-item">
-          <img src="/assets/home/home-bg.png" alt="Cacao" />
-          <div>
-            <strong>Cacao_2024_05_16_02</strong>
-            <p class="red-text">● Con podredumbre</p>
-            <small>16/05/2024 09:45 a.m.</small>
-          </div>
-        </div>
-
-        <div class="analysis-item">
-          <img src="/assets/home/home-bg.png" alt="Cacao" />
-          <div>
-            <strong>Cacao_2024_05_16_03</strong>
-            <p class="orange-text">● Con parásitos</p>
-            <small>16/05/2024 08:15 a.m.</small>
-          </div>
-        </div>
-      </div>
+      </app-chart-card>
     </section>
   </main>
 </section>
