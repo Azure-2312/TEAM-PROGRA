@@ -1,0 +1,9 @@
+# Carpetas temporales y de control
+remote_repo_temp/
+scratch/
+.sixth/
+*.log
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db

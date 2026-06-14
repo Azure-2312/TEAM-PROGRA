@@ -1,0 +1,212 @@
+<section class="register-page">
+
+  <div class="register-card">
+
+    <!-- IZQUIERDA -->
+
+    <div class="register-left">
+
+      <div class="left-content">
+
+        <div class="brand">
+          <img
+            src="/assets/images/logo-cacao.png"
+            alt="Logo"
+          />
+
+          <span>CacaoDetect</span>
+        </div>
+
+        <div class="welcome-text">
+          <h1>Comienza a analizar</h1>
+
+          <p>
+            Regístrate para obtener diagnósticos
+            precisos sobre el estado de tus cultivos.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- DERECHA -->
+
+    <div class="register-right">
+
+      <div class="form-box">
+
+        <h1>Crear cuenta</h1>
+
+        <p>
+          Únete y comienza a analizar tus cacaos
+        </p>
+
+        <form (submit)="onSubmit($event)">
+          @if (errorMsg) {
+            <div class="error-msg">
+              {{ errorMsg }}
+            </div>
+          }
+          @if (successMsg) {
+            <div class="success-msg">
+              {{ successMsg }}
+            </div>
+          }
+
+          <div class="input-group">
+            <input
+              type="text"
+              name="nombreCompleto"
+              [(ngModel)]="nombreCompleto"
+              placeholder="Nombre completo"
+            />
+          </div>
+
+          <div class="input-group">
+            <input
+              type="email"
+              name="correo"
+              [(ngModel)]="correo"
+              placeholder="Correo electrónico"
+            />
+          </div>
+
+          <div class="input-group">
+            <input
+              type="text"
+              name="username"
+              [(ngModel)]="username"
+              placeholder="Nombre de usuario"
+            />
+          </div>
+
+          <div class="input-group">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              name="password"
+              [(ngModel)]="password"
+              placeholder="Contraseña"
+            />
+            <button
+              type="button"
+              class="toggle-password-btn"
+              (click)="showPassword = !showPassword"
+              [style.opacity]="showPassword ? '1' : '0.5'"
+              [title]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            >
+              @if (showPassword) {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12C2 12 5 5 12 5C19 5 22 12 22 12C22 12 19 19 12 19C5 19 2 12 2 12Z" />
+                  <circle cx="12" cy="12" r="3.5" />
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12C2 12 5 5 12 5C19 5 22 12 22 12C22 12 19 19 12 19C5 19 2 12 2 12Z" />
+                  <circle cx="12" cy="12" r="3.5" />
+                  <line x1="3" y1="21" x2="21" y2="3" />
+                </svg>
+              }
+            </button>
+          </div>
+
+          <div class="input-group">
+            <input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              name="confirmPassword"
+              [(ngModel)]="confirmPassword"
+              placeholder="Confirmar contraseña"
+            />
+            <button
+              type="button"
+              class="toggle-password-btn"
+              (click)="showConfirmPassword = !showConfirmPassword"
+              [style.opacity]="showConfirmPassword ? '1' : '0.5'"
+              [title]="showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            >
+              @if (showConfirmPassword) {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12C2 12 5 5 12 5C19 5 22 12 22 12C22 12 19 19 12 19C5 19 2 12 2 12Z" />
+                  <circle cx="12" cy="12" r="3.5" />
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12C2 12 5 5 12 5C19 5 22 12 22 12C22 12 19 19 12 19C5 19 2 12 2 12Z" />
+                  <circle cx="12" cy="12" r="3.5" />
+                  <line x1="3" y1="21" x2="21" y2="3" />
+                </svg>
+              }
+            </button>
+          </div>
+
+          <label class="terms">
+            <input
+              type="checkbox"
+              name="aceptarTerminos"
+              [(ngModel)]="aceptarTerminos"
+            />
+            <span>
+              Acepto los <a href="javascript:void(0)" (click)="openTerms($event)">Términos y condiciones</a>
+            </span>
+          </label>
+
+          <button class="btn-register" type="submit" [disabled]="loading">
+            {{ loading ? 'Registrando...' : 'Registrarse' }}
+          </button>
+        </form>
+
+        <div class="login-link">
+
+          ¿Ya tienes cuenta?
+
+          <a routerLink="/login">
+            Iniciar sesión
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  @if (showTermsModal) {
+    <div class="modal-backdrop" (click)="closeTerms()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Términos y Condiciones de Uso</h2>
+        </div>
+        
+        <div class="modal-body">
+          <h3>1. Información General del Servicio</h3>
+          <p>CacaoDetect es una herramienta tecnológica interactiva diseñada para asistir a agricultores y profesionales del sector en el análisis y pre-diagnóstico del estado fitosanitario de mazorcas de cacao mediante algoritmos avanzados de visión artificial.</p>
+
+          <h3>2. Descargo de Responsabilidad Técnica (Fitosanitaria)</h3>
+          <p class="highlight-terms">
+            <strong>AVISO CRÍTICO DE EXCLUSIÓN DE RESPONSABILIDAD:</strong> Los modelos de aprendizaje profundo (como YOLOv8 y EfficientNet) utilizados en esta plataforma realizan clasificaciones probabilísticas basadas en patrones de color, textura y forma presentes en las imágenes subidas. Sin embargo, factores ajenos al sistema, tales como:
+          </p>
+          <ul class="highlight-list">
+            <li>Nivel inadecuado de iluminación en la toma.</li>
+            <li>Enfoque o resolución deficiente de la cámara.</li>
+            <li>Diferencias morfológicas en la variedad del cacao analizado.</li>
+            <li>Suciedad o sombras en la superficie de la mazorca.</li>
+          </ul>
+          <p class="highlight-terms">
+            pueden inducir a <strong>errores de diagnóstico, falsos positivos o falsos negativos</strong>. Por consiguiente, los desarrolladores, creadores y administradores de CacaoDetect **no se responsabilizan por decisiones agrícolas erróneas, pérdidas de cultivos, pérdidas económicas o daños materiales** resultantes de interpretar el resultado del análisis como un diagnóstico absoluto e infalible.
+          </p>
+
+          <h3>3. Uso Recomendado y Buenas Prácticas</h3>
+          <p>Los reportes generados por la plataforma son únicamente indicativos y deben emplearse con fines educativos y de soporte orientativo. Toda sospecha de infección grave (como Moniliasis, Mazorca Negra o daños por plagas) debe ser corroborada a través de inspecciones directas en el campo y validada por un ingeniero agrónomo cualificado o un experto técnico antes de aplicar tratamientos químicos o tomar medidas de erradicación.</p>
+
+          <h3>4. Propiedad Intelectual e Imágenes</h3>
+          <p>Al subir imágenes a CacaoDetect, usted garantiza que posee los derechos necesarios para su uso. CacaoDetect utilizará estas imágenes exclusivamente para realizar el procesamiento de la predicción y almacenar su historial personal, protegiendo su autoría intelectual.</p>
+
+          <h3>5. Seguridad y Datos de Registro</h3>
+          <p>La información personal proporcionada durante el registro se almacena de forma segura de acuerdo con estándares de encriptación de contraseñas de desarrollo ético. No compartimos sus datos con terceros sin su consentimiento expreso.</p>
+        </div>
+      </div>
+    </div>
+  }
+
+</section>

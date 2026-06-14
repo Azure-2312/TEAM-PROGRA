@@ -1,0 +1,18 @@
+# Dependencias de Node
+node_modules/
+
+# Archivos de caché y compilación de Angular
+.angular/
+dist/
+
+# Archivos de registros de errores
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos de IDE
+.vscode/
+.idea/
+
+# Variables de entorno locales
+.env

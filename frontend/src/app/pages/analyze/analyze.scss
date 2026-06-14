@@ -1,0 +1,345 @@
+.analyze-page {
+  width: 100%;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  background: #f5f5f3;
+  overflow: hidden;
+}
+
+.main-content {
+  padding: 20px 30px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.analyze-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+  flex: 1;
+  min-height: 0;
+}
+
+.upload-section {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  align-self: start;
+}
+
+.upload-card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+
+  h2 {
+    font-size: 16px;
+    margin-bottom: 12px;
+    color: #222;
+  }
+}
+
+.preview-image-container {
+  position: relative;
+  width: 100%;
+  height: 240px; /* Reduced from 280px to look perfect inside the card */
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.preview-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(25px) brightness(0.65);
+  transform: scale(1.15);
+  z-index: 1;
+}
+
+.preview-foreground {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  z-index: 2;
+}
+
+.result-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  align-self: start;
+}
+
+.preview-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.preview-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.change-btn,
+.analyze-btn {
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.change-btn {
+  background: white;
+  color: #347d2b;
+  border: 2px solid #347d2b;
+
+  &:hover {
+    background: #f7fafc;
+    border-color: #2d6d25;
+    color: #2d6d25;
+  }
+}
+
+.analyze-btn {
+  background: #347d2b;
+  color: white;
+
+  &:hover {
+    background: #2d6d25;
+  }
+}
+
+// Estilos estéticos para el selector de modelos
+.model-selector-container {
+  width: 100%;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  padding: 10px 16px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+
+  label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #4a5568; // Texto oscuro legible
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #347d2b; // Borde verde
+    background: #ffffff;
+    color: #2d3748;
+    cursor: pointer;
+    outline: none;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 500;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #2d6d25;
+      background-color: #f7fafc;
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(52, 125, 43, 0.15);
+    }
+  }
+}
+
+// Estilos de carga y spinner corregidos
+.loading-box {
+  text-align: center;
+  padding: 30px 20px;
+  background: white;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+
+  p {
+    color: #4a5568;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(52, 125, 43, 0.1); // Borde verde claro
+  border-top-color: #347d2b; // Verde de la marca activo
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Estilos para la barra de pestañas (upload-tabs)
+.upload-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  background: #f7f7f5;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.tab-btn {
+  flex: 1;
+  height: 38px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+  color: #4a5568;
+  transition: all 0.2s ease;
+
+  &.active {
+    background: #347d2b;
+    color: white;
+    box-shadow: 0 2px 6px rgba(52, 125, 43, 0.2);
+  }
+
+  &:hover:not(.active) {
+    background: rgba(0, 0, 0, 0.03);
+    color: #2d3748;
+  }
+}
+
+// Estilos de la interfaz de la cámara
+.camera-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.camera-stream-wrapper {
+  position: relative;
+  width: 100%;
+  height: 240px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.camera-placeholder {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #a0aec0;
+  gap: 8px;
+
+  span {
+    font-size: 32px;
+  }
+
+  p {
+    font-size: 12px;
+    margin: 0;
+  }
+}
+
+.camera-controls {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.btn-camera-action {
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.btn-activate {
+  background: #347d2b;
+  color: white;
+
+  &:hover {
+    background: #2d6d25;
+  }
+}
+
+.btn-capture {
+  background: #347d2b;
+  color: white;
+  flex: 2;
+
+  &:hover {
+    background: #2d6d25;
+  }
+}
+
+.btn-deactivate {
+  background: #e53e3e;
+  color: white;
+
+  &:hover {
+    background: #c53030;
+  }
+}
