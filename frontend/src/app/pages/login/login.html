@@ -1,0 +1,120 @@
+<section class="login-page">
+
+  <div class="login-card">
+
+    <!-- IZQUIERDA -->
+
+    <div class="login-left">
+
+      <div class="left-content">
+
+        <div class="brand">
+          <img
+            src="/assets/images/logo-cacao.png"
+            alt="Logo"
+          />
+
+          <span>CacaoDetect</span>
+        </div>
+
+        <div class="welcome-text">
+          <h1>Bienvenido de nuevo</h1>
+
+          <p>
+            Inicia sesión para continuar
+            analizando tus cacaos.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- DERECHA -->
+
+    <div class="login-right">
+
+      <div class="form-box">
+
+        <h1>Iniciar sesión</h1>
+
+        <form (submit)="onSubmit($event)">
+          @if (errorMsg) {
+            <div class="error-msg">
+              {{ errorMsg }}
+            </div>
+          }
+
+          <div class="input-group">
+            <label>Usuario o correo</label>
+            <input
+              type="text"
+              name="usuarioCorreo"
+              [(ngModel)]="usuarioCorreo"
+              placeholder="Ingresa tu correo o usuario"
+            />
+          </div>
+
+          <div class="input-group">
+            <label>Contraseña</label>
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              name="password"
+              [(ngModel)]="password"
+              placeholder="Ingresa tu contraseña"
+            />
+            <button
+              type="button"
+              class="toggle-password-btn"
+              (click)="showPassword = !showPassword"
+              [style.opacity]="showPassword ? '1' : '0.5'"
+              [title]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            >
+              @if (showPassword) {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12C2 12 5 5 12 5C19 5 22 12 22 12C22 12 19 19 12 19C5 19 2 12 2 12Z" />
+                  <circle cx="12" cy="12" r="3.5" />
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12C2 12 5 5 12 5C19 5 22 12 22 12C22 12 19 19 12 19C5 19 2 12 2 12Z" />
+                  <circle cx="12" cy="12" r="3.5" />
+                  <line x1="3" y1="21" x2="21" y2="3" />
+                </svg>
+              }
+            </button>
+          </div>
+
+          <div class="options">
+            <label class="remember">
+              <input
+                type="checkbox"
+                name="recordarme"
+                [(ngModel)]="recordarme"
+              />
+              Recordarme
+            </label>
+            <a routerLink="/recover-password">
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
+
+          <button class="btn-login" type="submit" [disabled]="loading">
+            {{ loading ? 'Iniciando...' : 'Iniciar sesión' }}
+          </button>
+        </form>
+
+        <div class="register-link">
+          ¿No tienes cuenta?
+          <a routerLink="/register">
+            Registrarse
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>

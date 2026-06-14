@@ -1,0 +1,82 @@
+<section class="dashboard-page">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-content">
+    <app-page-header
+      [title]="'Hola, ' + usuarioNombre + ' 👋'"
+      subtitle="Resumen general de tus análisis">
+
+      <button actions routerLink="/analyze">
+        Analizar nuevo cacao
+      </button>
+
+    </app-page-header>
+
+    <section class="stats">
+      <app-stat-card
+        title="Total análisis"
+        [value]="totalAnalisis.toString()">
+      </app-stat-card>
+
+      <app-stat-card
+        title="Cacao sano"
+        [value]="sanoCount.toString()"
+        [subtitle]="sanoPct"
+        color="green">
+      </app-stat-card>
+
+      <app-stat-card
+        title="Con podredumbre"
+        [value]="podredumbreCount.toString()"
+        [subtitle]="podredumbrePct"
+        color="red">
+      </app-stat-card>
+
+      <app-stat-card
+        title="Con parásitos"
+        [value]="parasitoCount.toString()"
+        [subtitle]="parasitoPct"
+        color="orange">
+      </app-stat-card>
+    </section>
+
+    <section class="dashboard-grid">
+      <app-chart-card title="Análisis por fecha">
+        <div class="fake-chart" style="display: flex; align-items: flex-end; justify-content: space-around; height: 180px; padding: 10px 20px; background: rgba(255,255,255,0.02); border-radius: 8px;">
+          @if (chartData.length === 0) {
+            <p style="color: #666; font-size: 14px; margin: auto;">Sin análisis registrados en este periodo.</p>
+          }
+          @for (day of chartData; track day.fecha) {
+            <div 
+              [style.height.%]="(day.cantidad / (totalAnalisis || 1)) * 90 + 10" 
+              [title]="day.fecha + ': ' + day.cantidad + ' análisis'"
+              style="width: 25px; background: linear-gradient(180deg, #7b2cbf, #9d4edd); border-radius: 4px; transition: height 0.5s ease; cursor: pointer;">
+            </div>
+          }
+        </div>
+
+        <div class="chart-dates" style="display: flex; justify-content: space-around; margin-top: 10px; font-size: 11px; color: #888;">
+          @for (day of chartData; track day.fecha) {
+            <span>{{ day.fecha | date:'dd MMM' }}</span>
+          }
+        </div>
+      </app-chart-card>
+
+      <app-chart-card title="Últimos análisis">
+        <div class="recent-list">
+          @for (item of ultimosAnalisis; track item.nombre_analisis) {
+            <app-analysis-item
+              [image]="item.imagen_url"
+              [title]="item.nombre_analisis"
+              [result]="item.nombre"
+              [date]="item.fecha"
+              [color]="getColorForClass(item.codigo)">
+            </app-analysis-item>
+          } @empty {
+            <p style="color: #666; text-align: center; margin: 40px 0;">No tienes análisis recientes.</p>
+          }
+        </div>
+      </app-chart-card>
+    </section>
+  </main>
+</section>

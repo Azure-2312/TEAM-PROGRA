@@ -1,16 +1,9 @@
-# Angular
-frontend/frontend-app/node_modules
-frontend/frontend-app/.angular
-frontend/frontend-app/dist
+# Carpetas temporales y de control
+remote_repo_temp/
+scratch/
+.sixth/
+*.log
 
-# Python
-backend/venv
-backend/__pycache__
-*.pyc
-
-# VSCode
-.vscode/
-
-# Sistema
+# Archivos de sistema
 .DS_Store
 Thumbs.db

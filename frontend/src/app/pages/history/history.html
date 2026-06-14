@@ -1,0 +1,66 @@
+<section class="history-page">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-content">
+    <app-page-header
+      title="Historial de análisis"
+      subtitle="Consulta todos los análisis realizados">
+    </app-page-header>
+
+    <section class="filters">
+      <input type="text" placeholder="🔍  Buscar análisis..." [(ngModel)]="searchQuery" />
+
+      <select [(ngModel)]="selectedResultFilter">
+        <option value="todos">Todos los resultados</option>
+        <option value="sano">Sano</option>
+        <option value="podredumbre">Con podredumbre</option>
+        <option value="parasitos">Con parásitos</option>
+      </select>
+    </section>
+
+    <section class="table-card">
+      @if (loading) {
+        <div style="text-align: center; padding: 40px; color: #aaa;">Cargando historial...</div>
+      } @else {
+        <table>
+          <thead>
+            <tr>
+              <th>Imagen</th>
+              <th>Nombre</th>
+              <th>Resultado</th>
+              <th>Confianza</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (item of filteredHistorial; track item.id) {
+              <tr class="clickable-row">
+                <td>
+                  <img [src]="item.imagen_url" alt="Cacao" style="object-fit: cover;" />
+                </td>
+
+                <td>{{ item.nombre_analisis }}</td>
+
+                <td>
+                  <span class="status" [class]="getColorForClass(item.codigo)"></span>
+                  {{ item.nombre }}
+                </td>
+
+                <td>{{ item.confianza }}%</td>
+
+                <td>{{ item.fecha }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" style="text-align: center; color: #888; padding: 40px 0;">
+                  No se encontraron análisis en el historial.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </section>
+  </main>
+</section>

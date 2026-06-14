@@ -1,0 +1,152 @@
+<section class="analyze-page">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-content">
+    <app-page-header
+      title="Analizar nuevo cacao"
+      subtitle="Sube una imagen para detectar el estado del cacao">
+    </app-page-header>
+
+    <section class="analyze-grid">
+      <div class="upload-section">
+        <div class="model-selector-container">
+          <label>Modelo de Inteligencia Artificial:</label>
+          <select [(ngModel)]="modeloSeleccionado">
+            <option value="yolo">YOLOv8 (Detección + Clasificación - 5 clases)</option>
+            <option value="keras">EfficientNet Keras (Clasificación - 3 clases)</option>
+          </select>
+        </div>
+
+        <div class="upload-card">
+          <h2>Imagen del cacao</h2>
+
+          <div class="upload-tabs">
+            <button 
+              type="button"
+              class="tab-btn" 
+              [class.active]="activeTab === 'upload'" 
+              (click)="setTab('upload')">
+              Subir archivo
+            </button>
+            <button 
+              type="button"
+              class="tab-btn" 
+              [class.active]="activeTab === 'camera'" 
+              (click)="setTab('camera')">
+              Usar cámara
+            </button>
+          </div>
+
+          @if (!selectedImage) {
+            @if (activeTab === 'upload') {
+              <app-upload-box
+                (imageSelected)="onImageSelected($event)">
+              </app-upload-box>
+            }
+
+            @if (activeTab === 'camera') {
+              <div class="camera-box">
+                <div class="camera-stream-wrapper">
+                  <video #videoElement autoplay playsinline></video>
+                  @if (!mediaStream) {
+                    <div class="camera-placeholder">
+                      <span>📷</span>
+                      <p>La cámara está apagada o desactivada</p>
+                    </div>
+                  }
+                </div>
+
+                <div class="camera-controls">
+                  @if (!mediaStream) {
+                    <button type="button" class="btn-camera-action btn-activate" (click)="startCamera()">
+                      Activar cámara
+                    </button>
+                  } @else {
+                    <button type="button" class="btn-camera-action btn-capture" (click)="capturePhoto()">
+                      Tomar foto 📸
+                    </button>
+                    <button type="button" class="btn-camera-action btn-deactivate" (click)="stopCamera()">
+                      Apagar cámara
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          }
+
+          @if (selectedImage) {
+            <div class="preview-card">
+              <div class="preview-image-container">
+                <img
+                  class="preview-background"
+                  [src]="selectedImage"
+                  alt=""
+                />
+                <img
+                  class="preview-foreground"
+                  [src]="selectedImage"
+                  alt="Vista previa cacao"
+                />
+              </div>
+
+              @if (!isAnalyzed && !loading) {
+                <div class="preview-actions">
+                  <input
+                    type="file"
+                    #fileInput
+                    accept="image/png, image/jpeg"
+                    hidden
+                    (change)="onChangeImageSelected($event)"
+                  />
+                  <button class="change-btn" (click)="fileInput.click()">
+                    Cambiar imagen
+                  </button>
+
+                  <button class="analyze-btn" (click)="analyzeImage()">
+                    Analizar cacao
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="result-section">
+        @if (loading) {
+          <div class="loading-box">
+            <div class="spinner"></div>
+            <p>Analizando imagen con el modelo {{ modeloSeleccionado | uppercase }}...</p>
+          </div>
+        }
+
+        @if (errorMsg) {
+          <div class="error-box" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 20px; text-align: center; color: #fca5a5; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+            <span style="font-size: 30px;">⚠️</span>
+            <p style="margin: 0; font-size: 14px; font-weight: 500;">{{ errorMsg }}</p>
+            <button (click)="resetAnalysis()" style="padding: 8px 16px; background: #ef4444; border: none; border-radius: 6px; color: #fff; cursor: pointer; font-size: 13px; font-weight: 500; transition: background 0.2s;">
+              Intentar de nuevo
+            </button>
+          </div>
+        }
+
+        @if (isAnalyzed && resultado) {
+          <app-result-card
+            [result]="resultado.resultado"
+            [confidence]="resultado.confianza + '%'"
+            [color]="resultado.codigo_resultado === 'cacao_sano' ? 'green' : (resultado.codigo_resultado === 'cacao_moniliasis' || resultado.codigo_resultado === 'cacao_mazorca_negra' ? 'red' : 'orange')"
+            [icon]="resultado.codigo_resultado === 'cacao_sano' ? '✓' : '!'">
+          </app-result-card>
+
+          <app-recommendation-card
+            title="Recomendación"
+            [message1]="resultado.recomendacion"
+            [message2]="'Modelo de IA utilizado: ' + (resultado.modelo_usado | uppercase)"
+            buttonText="Nuevo análisis"
+            (buttonClick)="resetAnalysis()">
+          </app-recommendation-card>
+        }
+      </div>
+    </section>
+  </main>
+</section>

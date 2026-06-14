@@ -1,0 +1,68 @@
+<section class="profile-page">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-content">
+    <section class="profile-card">
+      <h1>Mi perfil</h1>
+      <div class="avatar-box">
+        <img [src]="usuario.foto_perfil_url || '/assets/profile/user-profile.png'" alt="Usuario" style="object-fit: cover;" />
+      </div>
+
+      <div class="profile-info">
+        
+        <!-- Alertas de éxito o error -->
+        <div class="success-msg" *ngIf="successMsg">
+          {{ successMsg }}
+        </div>
+        <div class="error-msg" *ngIf="errorMsg">
+          {{ errorMsg }}
+        </div>
+
+        <div class="info-item">
+          <label>Nombre completo</label>
+          <p *ngIf="!editMode">{{ usuario.nombre_completo }}</p>
+          <input *ngIf="editMode" type="text" [(ngModel)]="nombreCompleto" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff;" />
+        </div>
+
+        <div class="info-item">
+          <label>Correo electrónico</label>
+          <p *ngIf="!editMode">{{ usuario.correo }}</p>
+          <input *ngIf="editMode" type="email" [(ngModel)]="correo" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff;" />
+        </div>
+
+        <div class="info-item">
+          <label>Usuario</label>
+          <p *ngIf="!editMode">{{ usuario.username }}</p>
+          <input *ngIf="editMode" type="text" [(ngModel)]="username" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff;" />
+        </div>
+
+        <div class="info-item" *ngIf="!editMode">
+          <label>Cantidad de análisis realizados</label>
+          <p>{{ usuario.cantidad_analisis || 0 }}</p>
+        </div>
+
+        <div class="info-item" *ngIf="editMode">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" [(ngModel)]="showPasswordInput" />
+            Cambiar contraseña
+          </label>
+          <input *ngIf="showPasswordInput" type="password" placeholder="Nueva contraseña" [(ngModel)]="passwordNueva" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; margin-top: 8px;" />
+        </div>
+      </div>
+
+      <div class="profile-actions" style="display: flex; gap: 15px; margin-top: 25px; width: 100%; justify-content: center;">
+        <button *ngIf="!editMode" class="change-password" (click)="toggleEditMode()" style="background: #7b2cbf; border: none; border-radius: 8px; padding: 12px 24px; color: #fff; cursor: pointer; font-weight: 500; font-size: 15px;">
+          Editar perfil
+        </button>
+
+        <button *ngIf="editMode" (click)="guardarCambios()" [disabled]="loading" style="background: #4caf50; border: none; border-radius: 8px; padding: 12px 24px; color: #fff; cursor: pointer; font-weight: 500; font-size: 15px;">
+          {{ loading ? 'Guardando...' : 'Guardar' }}
+        </button>
+
+        <button *ngIf="editMode" (click)="toggleEditMode()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 12px 24px; color: #fff; cursor: pointer; font-weight: 500; font-size: 15px;">
+          Cancelar
+        </button>
+      </div>
+    </section>
+  </main>
+</section>

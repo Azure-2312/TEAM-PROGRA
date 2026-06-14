@@ -1,0 +1,573 @@
+.reports-page {
+  width: 100%;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  background: #f5f5f3;
+  overflow-y: auto;
+}
+
+.main-content {
+  padding: 40px 34px 120px;
+  overflow: visible;
+}
+
+
+.date-filter {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  span {
+    font-size: 15px;
+    font-weight: 700;
+    color: #444;
+  }
+
+  select {
+    height: 42px;
+    padding: 0 18px;
+    border: 2px solid #e4e4e4;
+    border-radius: 9px;
+    background: white;
+    color: #777;
+    font-size: 14px;
+    outline: none;
+  }
+}
+
+.export-btn {
+  background: #347d2b;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(52, 125, 43, 0.2);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #2d6d25;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(52, 125, 43, 0.3);
+  }
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  margin-bottom: 28px;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+.pie-area {
+  display: flex;
+  align-items: center;
+  min-height: 220px;
+  gap: 34px;
+}
+
+.pie-chart {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: conic-gradient(
+    #2f8a2c 0% 51.3%,
+    #d83a34 51.3% 80.9%,
+    #f28c1b 80.9% 100%
+  );
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+
+  p {
+    font-size: 17px;
+    font-weight: 700;
+    color: #444;
+  }
+}
+
+.dot {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.green-dot {
+  background: #2f8a2c;
+}
+
+.red-dot {
+  background: #d83a34;
+}
+
+.orange-dot {
+  background: #f28c1b;
+}
+
+.bar-chart {
+  height: 190px;
+  display: flex;
+  align-items: end;
+  gap: 26px;
+  padding: 18px 24px;
+  border-bottom: 2px solid #e8e8e8;
+
+  div {
+    width: 36px;
+    background: linear-gradient(180deg, #66b85a, #dcefd9);
+    border-radius: 8px 8px 0 0;
+  }
+}
+
+.chart-dates {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 14px;
+  color: #777;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+// Estilos para el configurador de reporte
+.export-config-card {
+  background: white;
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+
+  .config-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    border-bottom: 1.5px solid #edf2f7;
+    padding-bottom: 10px;
+
+    .config-icon {
+      width: 20px;
+      height: 20px;
+      color: #347d2b;
+    }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2d3748;
+      margin: 0;
+    }
+  }
+
+  .config-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1.2fr 1.6fr;
+    gap: 20px;
+    align-items: end;
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+  }
+
+  .config-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: opacity 0.25s ease;
+
+    label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #4a5568;
+    }
+
+    select {
+      height: 42px;
+      padding: 0 12px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      background: white;
+      color: #2d3748;
+      font-size: 14px;
+      font-weight: 500;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:focus {
+        border-color: #347d2b;
+        box-shadow: 0 0 0 3px rgba(52, 125, 43, 0.1);
+      }
+    }
+  }
+
+  .config-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-bottom: 2px;
+  }
+
+  .check-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a5568;
+    cursor: pointer;
+    user-select: none;
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: #347d2b;
+    }
+  }
+}
+
+// ==========================================
+// ESTILOS PARA IMPRESIÓN (PDF REPORT GENERATION)
+// ==========================================
+
+.print-report-container {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 15mm 12mm 15mm 12mm;
+  }
+
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .reports-page > *:not(.print-report-container) {
+    display: none !important;
+  }
+
+  .print-report-container {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    background: #fff !important;
+  }
+
+  .print-page {
+    page-break-after: always;
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    clear: both;
+    padding-top: 10px;
+  }
+
+  .print-metric-card, 
+  .dist-table-wrapper, 
+  .print-chart-box, 
+  .rec-section-item,
+  tr {
+    page-break-inside: avoid;
+  }
+
+  .report-page-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1.5px solid #347d2b;
+    padding-bottom: 5px;
+    margin-bottom: 25px;
+    font-size: 9pt;
+    color: #555;
+    font-weight: 600;
+  }
+
+  h2 {
+    font-size: 16pt;
+    color: #1a3014;
+    border-bottom: 1px solid #edf2f7;
+    padding-bottom: 6px;
+    margin-bottom: 16px;
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: 12pt;
+    color: #2d3748;
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+
+  .print-cover {
+    height: 250mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 30mm 10mm;
+    border: 3px double #347d2b;
+    border-radius: 4px;
+    box-sizing: border-box;
+
+    .cover-header {
+      .cover-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .cover-logo {
+          width: 45px;
+          height: 45px;
+        }
+
+        span {
+          font-size: 20pt;
+          font-weight: 800;
+          color: #347d2b;
+        }
+      }
+    }
+
+    .cover-body {
+      margin-top: 40mm;
+      text-align: left;
+
+      .report-badge {
+        display: inline-block;
+        background: rgba(52, 125, 43, 0.08);
+        border: 1.5px solid #347d2b;
+        color: #347d2b;
+        font-weight: 800;
+        font-size: 10pt;
+        padding: 5px 12px;
+        border-radius: 20px;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      h1 {
+        font-size: 28pt;
+        line-height: 1.15;
+        font-weight: 800;
+        color: #1a3014;
+        margin-top: 0;
+        margin-bottom: 10px;
+      }
+
+      .subtitle {
+        font-size: 12pt;
+        color: #4a5568;
+        margin-bottom: 25mm;
+        line-height: 1.5;
+        max-width: 85%;
+      }
+
+      .cover-meta {
+        border-top: 2px solid #347d2b;
+        padding-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .meta-row {
+          font-size: 11pt;
+          color: #2d3748;
+
+          strong {
+            display: inline-block;
+            width: 140px;
+            color: #4a5568;
+          }
+          span {
+            font-weight: 600;
+          }
+        }
+      }
+    }
+
+    .cover-footer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 15px;
+      text-align: center;
+      font-size: 8.5pt;
+      color: #718096;
+    }
+  }
+
+  .print-metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .print-metric-card {
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    padding: 12px;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .metric-title {
+      font-size: 8.5pt;
+      font-weight: 700;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .metric-value {
+      font-size: 20pt;
+      font-weight: 800;
+      color: #2d3748;
+    }
+
+    .green-val { color: #2f8a2c; }
+    .red-val { color: #d83a34; }
+
+    .metric-sub {
+      font-size: 8pt;
+      color: #718096;
+    }
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-bottom: 20px !important;
+
+    th {
+      background: #f7fafc !important;
+      color: #2d3748 !important;
+      border: 1px solid #e2e8f0 !important;
+      padding: 8px 10px !important;
+      font-size: 9.5pt !important;
+      font-weight: 700 !important;
+      text-align: left !important;
+    }
+
+    td {
+      border: 1px solid #e2e8f0 !important;
+      padding: 8px 10px !important;
+      font-size: 9pt !important;
+      color: #2d3748 !important;
+      vertical-align: middle !important;
+    }
+  }
+
+  .print-table-small {
+    margin-top: 10px;
+
+    th, td {
+      padding: 6px 8px !important;
+    }
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 8pt;
+    font-weight: 700;
+    border-radius: 4px;
+  }
+  .badge-green {
+    background: rgba(47, 138, 44, 0.08) !important;
+    color: #2f8a2c !important;
+    border: 1px solid rgba(47, 138, 44, 0.2);
+  }
+  .badge-red {
+    background: rgba(216, 58, 52, 0.08) !important;
+    color: #d83a34 !important;
+    border: 1px solid rgba(216, 58, 52, 0.2);
+  }
+  .badge-orange {
+    background: rgba(242, 140, 27, 0.08) !important;
+    color: #f28c1b !important;
+    border: 1px solid rgba(242, 140, 27, 0.2);
+  }
+
+  .print-charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .print-chart-box {
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    padding: 12px;
+
+    h4 {
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #2d3748;
+      margin: 0 0 10px 0;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 5px;
+    }
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    margin-right: 4px;
+  }
+
+  .print-thumbnail {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1.5px solid #e2e8f0;
+  }
+
+  .rec-section-item {
+    border-bottom: 1.5px dashed #edf2f7;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+
+    h3 {
+      font-size: 11pt;
+      color: #1a3014;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    p {
+      font-size: 9.5pt;
+      color: #4a5568;
+      margin-top: 0;
+      margin-bottom: 6px;
+      line-height: 1.45;
+    }
+  }
+}

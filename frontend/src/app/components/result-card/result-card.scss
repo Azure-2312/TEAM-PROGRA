@@ -1,0 +1,87 @@
+.result-card {
+  min-height: auto;
+  overflow: hidden;
+  background: white;
+  border-radius: 14px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+
+  h2 {
+    font-size: 16px;
+    color: #222;
+    margin-bottom: 12px;
+  }
+}
+
+.result-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  p {
+    margin-top: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #555;
+  }
+}
+
+.result-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.green {
+  background: #3f8f36;
+}
+
+.red {
+  background: #d83a34;
+}
+
+.orange {
+  background: #f28c1b;
+}
+
+.green-text {
+  font-size: 24px;
+  color: #3f8f36;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.red-text {
+  font-size: 24px;
+  color: #d83a34;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.orange-text {
+  font-size: 24px;
+  color: #f28c1b;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.progress {
+  width: 100%;
+  height: 8px;
+  background: #e6e6e6;
+  border-radius: 20px;
+  margin-top: 12px;
+  overflow: hidden;
+
+  div {
+    height: 100%;
+    border-radius: 20px;
+  }
+}
