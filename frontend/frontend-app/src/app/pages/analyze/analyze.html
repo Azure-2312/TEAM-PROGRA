@@ -1,0 +1,63 @@
+<section class="analyze-page">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-content">
+    <app-page-header
+      title="Analizar nuevo cacao"
+      subtitle="Sube una imagen para detectar el estado del cacao">
+    </app-page-header>
+
+    <section class="analyze-grid">
+      <div class="upload-section">
+        <h2>Imagen del cacao</h2>
+
+        @if (!selectedImage) {
+          <app-upload-box
+            (imageSelected)="onImageSelected($event)">
+          </app-upload-box>
+        }
+
+        @if (selectedImage) {
+          <div class="preview-card">
+            <img
+              class="preview-image"
+              [src]="selectedImage"
+              alt="Vista previa cacao"
+            />
+
+            @if (!isAnalyzed) {
+              <div class="preview-actions">
+                <button class="change-btn" (click)="removeImage()">
+                  Cambiar imagen
+                </button>
+
+                <button class="analyze-btn" (click)="analyzeImage()">
+                  Analizar cacao
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="result-section">
+        @if (isAnalyzed) {
+          <app-result-card
+            result="Sano"
+            confidence="96%"
+            color="green"
+            icon="✓">
+          </app-result-card>
+
+          <app-recommendation-card
+            title="Recomendación"
+            message1="Producto apto visualmente."
+            message2="El cacao se encuentra en buen estado."
+            buttonText="Nuevo análisis"
+            (buttonClick)="resetAnalysis()">
+          </app-recommendation-card>
+        }
+      </div>
+    </section>
+  </main>
+</section>

@@ -1,0 +1,40 @@
+.analysis-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  img {
+    width: 58px;
+    height: 58px;
+    border-radius: 9px;
+    object-fit: cover;
+  }
+
+  strong {
+    color: #222;
+    font-size: 14px;
+  }
+
+  p {
+    margin: 3px 0;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  small {
+    color: #777;
+    font-size: 12px;
+  }
+}
+
+.green-text {
+  color: #2f8a2c;
+}
+
+.red-text {
+  color: #c93a32;
+}
+
+.orange-text {
+  color: #f28c1b;
+}

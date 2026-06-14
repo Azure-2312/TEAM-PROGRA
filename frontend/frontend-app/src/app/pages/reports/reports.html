@@ -1,0 +1,100 @@
+<section class="reports-page">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-content">
+    <app-page-header title="Reportes y estadísticas">
+      <div extra class="date-filter">
+        <span>Rango de fechas</span>
+
+        <select>
+          <option>10/05/2024 - 16/05/2024</option>
+        </select>
+      </div>
+
+      <button actions class="export-btn">
+        Exportar
+      </button>
+    </app-page-header>
+
+    <section class="stats">
+      <app-stat-card
+        title="Total análisis"
+        value="152">
+      </app-stat-card>
+
+      <app-stat-card
+        title="● Cacao sano"
+        value="78"
+        subtitle="51.3%"
+        color="green">
+      </app-stat-card>
+
+      <app-stat-card
+        title="● Con podredumbre"
+        value="45"
+        subtitle="29.6%"
+        color="red">
+      </app-stat-card>
+
+      <app-stat-card
+        title="● Con parásitos"
+        value="29"
+        subtitle="19.1%"
+        color="orange">
+      </app-stat-card>
+    </section>
+
+    <section class="charts-grid">
+
+      <app-chart-card title="Distribución de resultados">
+
+        <div class="pie-area">
+          <div class="pie-chart"></div>
+
+          <div class="legend">
+            <p>
+              <span class="dot green-dot"></span>
+              Sano (51.3%)
+            </p>
+
+            <p>
+              <span class="dot red-dot"></span>
+              Con podredumbre (29.6%)
+            </p>
+
+            <p>
+              <span class="dot orange-dot"></span>
+              Con parásitos (19.1%)
+            </p>
+          </div>
+        </div>
+
+      </app-chart-card>
+
+      <app-chart-card title="Análisis por fecha">
+
+        <div class="bar-chart">
+          <div style="height: 35%"></div>
+          <div style="height: 58%"></div>
+          <div style="height: 52%"></div>
+          <div style="height: 86%"></div>
+          <div style="height: 65%"></div>
+          <div style="height: 52%"></div>
+          <div style="height: 78%"></div>
+        </div>
+
+        <div class="chart-dates">
+          <span>10 May</span>
+          <span>11 May</span>
+          <span>12 May</span>
+          <span>13 May</span>
+          <span>14 May</span>
+          <span>15 May</span>
+          <span>16 May</span>
+        </div>
+
+      </app-chart-card>
+
+    </section>
+  </main>
+</section>

@@ -1,0 +1,128 @@
+<section class="history-page">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-content">
+    <app-page-header
+      title="Historial de análisis"
+      subtitle="Consulta todos los análisis realizados">
+    </app-page-header>
+
+    <section class="filters">
+      <input type="text" placeholder="🔍  Buscar análisis..." />
+
+      <select>
+        <option>Filtrar por fecha</option>
+      </select>
+
+      <select>
+        <option>Todos los resultados</option>
+        <option>Sano</option>
+        <option>Con podredumbre</option>
+        <option>Con parásitos</option>
+      </select>
+    </section>
+
+    <section class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Imagen</th>
+            <th>Nombre</th>
+            <th>Resultado</th>
+            <th>Confianza</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr class="clickable-row" routerLink="/result-detail">
+            <td>
+              <img src="/assets/analyze/cacao-preview.png" alt="Cacao" />
+            </td>
+
+            <td>Cacao_2024_05_16_01</td>
+
+            <td>
+              <span class="status green"></span>
+              Sano
+            </td>
+
+            <td>96%</td>
+
+            <td>16/05/2024 10:30 a.m.</td>
+          </tr>
+
+          <tr class="clickable-row" routerLink="/result-detail">
+            <td>
+              <img src="/assets/analyze/cacao-preview.png" alt="Cacao" />
+            </td>
+
+            <td>Cacao_2024_05_16_02</td>
+
+            <td>
+              <span class="status red"></span>
+              Con podredumbre
+            </td>
+
+            <td>92%</td>
+
+            <td>16/05/2024 08:45 a.m.</td>
+          </tr>
+
+          <tr class="clickable-row" routerLink="/result-detail">
+            <td>
+              <img src="/assets/analyze/cacao-preview.png" alt="Cacao" />
+            </td>
+
+            <td>Cacao_2024_05_16_03</td>
+
+            <td>
+              <span class="status orange"></span>
+              Con parásitos
+            </td>
+
+            <td>89%</td>
+
+            <td>16/05/2024 08:15 a.m.</td>
+          </tr>
+
+          <tr class="clickable-row" routerLink="/result-detail">
+            <td>
+              <img src="/assets/analyze/cacao-preview.png" alt="Cacao" />
+            </td>
+
+            <td>Cacao_2024_05_15_01</td>
+
+            <td>
+              <span class="status green"></span>
+              Sano
+            </td>
+
+            <td>95%</td>
+
+            <td>15/05/2024 04:30 p.m.</td>
+          </tr>
+
+          <tr class="clickable-row" routerLink="/result-detail">
+            <td>
+              <img src="/assets/analyze/cacao-preview.png" alt="Cacao" />
+            </td>
+
+            <td>Cacao_2024_05_15_02</td>
+
+            <td>
+              <span class="status red"></span>
+              Con podredumbre
+            </td>
+
+            <td>90%</td>
+
+            <td>15/05/2024 03:20 p.m.</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </section>
+  </main>
+</section>
