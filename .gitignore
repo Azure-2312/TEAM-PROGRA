@@ -1,9 +1,26 @@
-# Carpetas temporales y de control
-remote_repo_temp/
-scratch/
-.sixth/
-*.log
+# Python
+__pycache__/
+*.pyc
 
-# Archivos de sistema
+# Virtual environments
+.venv/
+venv/
+
+# Environment variables
+.env
+
+# Local databases
+*.db
+*.sqlite3
+
+# Angular
+node_modules/
+.angular/
+dist/
+
+# VS Code
+.vscode/
+
+# OS files
 .DS_Store
 Thumbs.db

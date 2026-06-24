@@ -46,8 +46,45 @@ cloudinary.config(
 # Cargar Modelo YOLOv8
 yolo_model = YOLO("best.pt")
 
-# Cargar Modelo Keras EfficientNet
-keras_model = tf.keras.models.load_model('efficientnet_cacao_v2.h5')
+# Reparar y cargar Modelo Keras EfficientNet
+import h5py
+import json
+
+def reparar_modelo_h5(ruta_modelo):
+    with h5py.File(ruta_modelo, "r+") as f:
+        config = f.attrs.get("model_config")
+
+        if config is None:
+            return
+
+        if isinstance(config, bytes):
+            config = config.decode("utf-8")
+
+        config_json = json.loads(config)
+
+        def limpiar_quantization(obj):
+            if isinstance(obj, dict):
+                obj.pop("quantization_config", None)
+
+                for valor in obj.values():
+                    limpiar_quantization(valor)
+
+            elif isinstance(obj, list):
+                for item in obj:
+                    limpiar_quantization(item)
+
+        limpiar_quantization(config_json)
+
+        f.attrs.modify("model_config", json.dumps(config_json))
+
+modelo_keras_path = "efficientnet_cacao_v2.h5"
+
+reparar_modelo_h5(modelo_keras_path)
+
+keras_model = tf.keras.models.load_model(
+    modelo_keras_path,
+    compile=False
+)
 
 KERAS_CLASES = ['Fito', 'Monilia', 'Sana']
 
