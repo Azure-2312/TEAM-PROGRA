@@ -1,14 +1,19 @@
 import os
 import io
+import random
+import string
+import smtplib
+import threading
 from datetime import datetime
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
 import cloudinary
 import cloudinary.uploader
-from ultralytics import YOLO
-import tensorflow as tf
 import numpy as np
 from PIL import Image
 from sqlalchemy import func, Date, cast
@@ -20,37 +25,55 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-# Configuración de PostgreSQL (Local y Render)
+# Base de datos
 database_url = os.getenv("DATABASE_URL")
+
 if database_url:
-    # Render suele proveer la URL con 'postgres://', pero SQLAlchemy requiere 'postgresql://'
     if database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = (
-        f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
-        f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
-    )
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
-# Configuración de Cloudinary
+# Cloudinary
 cloudinary.config(
     cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
     api_key=os.getenv("CLOUDINARY_API_KEY"),
     api_secret=os.getenv("CLOUDINARY_API_SECRET")
 )
 
-# Cargar Modelo YOLOv8
-yolo_model = YOLO("best.pt")
+# =========================
+# MODELOS BAJO DEMANDA
+# =========================
 
-# Reparar y cargar Modelo Keras EfficientNet
-import h5py
-import json
+yolo_model = None
+keras_model = None
+bd_inicializada = False
+
+KERAS_CLASES = ["Fito", "Monilia", "Sana"]
+
+KERAS_MAPPING = {
+    "Fito": "cacao_mazorca_negra",
+    "Monilia": "cacao_moniliasis",
+    "Sana": "cacao_sano"
+}
+
+RECOMENDACIONES = {
+    "cacao_barrenador": "Se recomienda revisar la mazorca afectada y separar los frutos con signos de perforación o daño interno.",
+    "cacao_mazorca_negra": "Se recomienda retirar las mazorcas afectadas y evitar el contacto con frutos sanos para reducir la propagación.",
+    "cacao_mirido": "Se recomienda inspeccionar la planta y controlar la presencia de insectos que puedan dañar la superficie del cacao.",
+    "cacao_moniliasis": "Se recomienda eliminar frutos infectados y mejorar la ventilación del cultivo para disminuir la humedad.",
+    "cacao_sano": "Producto apto visualmente. El cacao se encuentra en buen estado."
+}
+
 
 def reparar_modelo_h5(ruta_modelo):
+    import h5py
+    import json
+
     with h5py.File(ruta_modelo, "r+") as f:
         config = f.attrs.get("model_config")
 
@@ -65,46 +88,46 @@ def reparar_modelo_h5(ruta_modelo):
         def limpiar_quantization(obj):
             if isinstance(obj, dict):
                 obj.pop("quantization_config", None)
-
                 for valor in obj.values():
                     limpiar_quantization(valor)
-
             elif isinstance(obj, list):
                 for item in obj:
                     limpiar_quantization(item)
 
         limpiar_quantization(config_json)
-
         f.attrs.modify("model_config", json.dumps(config_json))
 
-modelo_keras_path = "efficientnet_cacao_v2.h5"
 
-reparar_modelo_h5(modelo_keras_path)
+def get_yolo_model():
+    global yolo_model
 
-keras_model = tf.keras.models.load_model(
-    modelo_keras_path,
-    compile=False
-)
+    if yolo_model is None:
+        from ultralytics import YOLO
+        yolo_model = YOLO("best.pt")
 
-KERAS_CLASES = ['Fito', 'Monilia', 'Sana']
+    return yolo_model
 
-# Mapeo de clases de Keras a códigos estándar en base de datos
-KERAS_MAPPING = {
-    'Fito': 'cacao_mazorca_negra',
-    'Monilia': 'cacao_moniliasis',
-    'Sana': 'cacao_sano'
-}
 
-RECOMENDACIONES = {
-    "cacao_barrenador": "Se recomienda revisar la mazorca afectada y separar los frutos con signos de perforación o daño interno.",
-    "cacao_mazorca_negra": "Se recomienda retirar las mazorcas afectadas y evitar el contacto con frutos sanos para reducir la propagación.",
-    "cacao_mirido": "Se recomienda inspeccionar la planta y controlar la presencia de insectos que puedan dañar la superficie del cacao.",
-    "cacao_moniliasis": "Se recomienda eliminar frutos infectados y mejorar la ventilación del cultivo para disminuir la humedad.",
-    "cacao_sano": "Producto apto visualmente. El cacao se encuentra en buen estado."
-}
+def get_keras_model():
+    global keras_model
+
+    if keras_model is None:
+        import tensorflow as tf
+
+        modelo_keras_path = "efficientnet_cacao_v2.h5"
+        reparar_modelo_h5(modelo_keras_path)
+
+        keras_model = tf.keras.models.load_model(
+            modelo_keras_path,
+            compile=False
+        )
+
+    return keras_model
 
 
 def preprocesar_imagen_keras(imagen_pil):
+    import tensorflow as tf
+
     imagen = imagen_pil.resize((224, 224))
     arr = np.array(imagen, dtype=np.float32)
     arr = tf.keras.applications.efficientnet.preprocess_input(arr)
@@ -115,7 +138,6 @@ def preprocesar_imagen_keras(imagen_pil):
 def inicializar_bd():
     db.create_all()
 
-    # Si no hay clasificaciones sembradas, las creamos
     if Clasificacion.query.first() is None:
         clases = [
             Clasificacion(codigo="cacao_barrenador", nombre="Cacao con barrenador", recomendacion=RECOMENDACIONES["cacao_barrenador"]),
@@ -126,20 +148,27 @@ def inicializar_bd():
         ]
         db.session.bulk_save_objects(clases)
 
-        # Sembrar un usuario demo si no existe ninguno
         if Usuario.query.first() is None:
-            password_demo = generate_password_hash("123456")
             demo_user = Usuario(
                 nombre_completo="Piero Montalvo",
                 correo="pieromontalvof@gmail.com",
                 username="Piermont",
-                password=password_demo,
+                password=generate_password_hash("123456"),
                 foto_perfil_url=""
             )
             db.session.add(demo_user)
 
         db.session.commit()
         print("Base de datos inicializada y sembrada con éxito.")
+
+
+@app.before_request
+def inicializar_una_vez():
+    global bd_inicializada
+
+    if not bd_inicializada:
+        inicializar_bd()
+        bd_inicializada = True
 
 
 def generar_nombre_analisis(usuario_id):
@@ -159,6 +188,11 @@ def home():
     return jsonify({"mensaje": "Backend CacaoDetect funcionando correctamente"})
 
 
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({"status": "ok"})
+
+
 @app.route("/api/register", methods=["POST"])
 def register():
     data = request.json
@@ -171,14 +205,12 @@ def register():
     if not nombre or not correo or not username or not password:
         return jsonify({"error": "Faltan datos requeridos"}), 400
 
-    password_hash = generate_password_hash(password)
-
     try:
         nuevo_usuario = Usuario(
             nombre_completo=nombre,
             correo=correo,
             username=username,
-            password=password_hash
+            password=generate_password_hash(password)
         )
         db.session.add(nuevo_usuario)
         db.session.commit()
@@ -193,7 +225,7 @@ def register():
             }
         })
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
         return jsonify({"error": "El correo o nombre de usuario ya está registrado"}), 400
 
@@ -230,13 +262,6 @@ def login():
     })
 
 
-import random
-import string
-import smtplib
-import threading
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
 def enviar_correo_recuperacion_hilo(correo, codigo):
     smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com")
     smtp_port = int(os.getenv("SMTP_PORT", "587"))
@@ -244,41 +269,44 @@ def enviar_correo_recuperacion_hilo(correo, codigo):
     smtp_pass = os.getenv("SMTP_PASSWORD", "")
 
     if not smtp_pass:
-        print("WARNING: SMTP_PASSWORD no configurado en .env. No se puede enviar correo.")
+        print("WARNING: SMTP_PASSWORD no configurado.")
         return
 
     try:
         msg = MIMEMultipart()
-        msg['From'] = smtp_user
-        msg['To'] = correo
-        msg['Subject'] = "CacaoDetect - Codigo de recuperacion de contrasena"
+        msg["From"] = smtp_user
+        msg["To"] = correo
+        msg["Subject"] = "CacaoDetect - Código de recuperación de contraseña"
 
         body = f"""
-        Hola,
+Hola,
 
-        Has solicitado restablecer tu contrasena en CacaoDetect.
-        Usa el siguiente codigo de verificacion de 6 digitos (numeros y letras):
+Has solicitado restablecer tu contraseña en CacaoDetect.
 
-        Codigo: {codigo}
+Código: {codigo}
 
-        Este codigo es de un solo uso. Si no solicitaste este cambio, puedes ignorar este mensaje.
+Este código es de un solo uso.
 
-        Atentamente,
-        El equipo de CacaoDetect
-        """
-        msg.attach(MIMEText(body, 'plain', 'utf-8'))
+Atentamente,
+El equipo de CacaoDetect
+"""
+        msg.attach(MIMEText(body, "plain", "utf-8"))
 
         server = smtplib.SMTP(smtp_host, smtp_port)
         server.starttls()
         server.login(smtp_user, smtp_pass)
         server.sendmail(smtp_user, correo, msg.as_string())
         server.quit()
-        print(f"Correo de recuperacion enviado con exito a {correo}")
+
     except Exception as e:
         print(f"Error al enviar correo: {e}")
 
+
 def enviar_correo_async(correo, codigo):
-    threading.Thread(target=enviar_correo_recuperacion_hilo, args=(correo, codigo)).start()
+    threading.Thread(
+        target=enviar_correo_recuperacion_hilo,
+        args=(correo, codigo)
+    ).start()
 
 
 @app.route("/api/recuperar-password/validar", methods=["POST"])
@@ -287,27 +315,24 @@ def recuperar_password_validar():
     correo = data.get("correo")
 
     if not correo:
-        return jsonify({"error": "El correo electronico es obligatorio"}), 400
+        return jsonify({"error": "El correo electrónico es obligatorio"}), 400
 
     usuario = Usuario.query.filter_by(correo=correo).first()
+
     if not usuario:
-        return jsonify({"error": "No existe un usuario registrado con este correo electronico."}), 404
+        return jsonify({"error": "No existe un usuario registrado con este correo electrónico."}), 404
 
-    # Generar codigo de 6 caracteres (letras y numeros)
-    codigo = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    codigo = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
-    # Desactivar codigos anteriores
     CodigoRecuperacion.query.filter_by(correo=correo, usado=False).update({"usado": True})
 
-    # Guardar nuevo codigo
     nuevo_registro = CodigoRecuperacion(correo=correo, codigo=codigo)
     db.session.add(nuevo_registro)
     db.session.commit()
 
-    # Enviar correo en segundo plano
     enviar_correo_async(correo, codigo)
 
-    return jsonify({"mensaje": "Codigo enviado con exito al correo."}), 200
+    return jsonify({"mensaje": "Código enviado con éxito al correo."}), 200
 
 
 @app.route("/api/recuperar-password/verificar", methods=["POST"])
@@ -317,13 +342,18 @@ def recuperar_password_verificar():
     codigo = data.get("codigo")
 
     if not correo or not codigo:
-        return jsonify({"error": "Correo y codigo son obligatorios"}), 400
+        return jsonify({"error": "Correo y código son obligatorios"}), 400
 
-    record = CodigoRecuperacion.query.filter_by(correo=correo, codigo=codigo.upper().strip(), usado=False).first()
+    record = CodigoRecuperacion.query.filter_by(
+        correo=correo,
+        codigo=codigo.upper().strip(),
+        usado=False
+    ).first()
+
     if not record:
-        return jsonify({"error": "El codigo ingresado es incorrecto o ha expirado."}), 400
+        return jsonify({"error": "El código ingresado es incorrecto o ha expirado."}), 400
 
-    return jsonify({"mensaje": "Codigo verificado con exito."}), 200
+    return jsonify({"mensaje": "Código verificado con éxito."}), 200
 
 
 @app.route("/api/recuperar-password/restablecer", methods=["POST"])
@@ -336,29 +366,32 @@ def recuperar_password_restablecer():
     if not correo or not codigo or not password:
         return jsonify({"error": "Faltan datos obligatorios"}), 400
 
-    record = CodigoRecuperacion.query.filter_by(correo=correo, codigo=codigo.upper().strip(), usado=False).first()
+    record = CodigoRecuperacion.query.filter_by(
+        correo=correo,
+        codigo=codigo.upper().strip(),
+        usado=False
+    ).first()
+
     if not record:
-        return jsonify({"error": "Accion no autorizada o codigo invalido."}), 400
+        return jsonify({"error": "Acción no autorizada o código inválido."}), 400
 
     usuario = Usuario.query.filter_by(correo=correo).first()
+
     if not usuario:
         return jsonify({"error": "Usuario no encontrado."}), 404
 
-    # Actualizar contrasena
     usuario.password = generate_password_hash(password)
-    # Marcar codigo como usado
     record.usado = True
-
     db.session.commit()
 
-    return jsonify({"mensaje": "Contrasena restablecida correctamente."}), 200
+    return jsonify({"mensaje": "Contraseña restablecida correctamente."}), 200
 
 
 @app.route("/api/analizar", methods=["POST"])
 def analizar():
     usuario_id = request.form.get("usuario_id")
     imagen = request.files.get("imagen")
-    modelo_seleccionado = request.form.get("modelo", "yolo")  # 'yolo' o 'keras'
+    modelo_seleccionado = request.form.get("modelo", "yolo")
 
     if not usuario_id or not imagen:
         return jsonify({"error": "Falta usuario_id o imagen"}), 400
@@ -372,19 +405,23 @@ def analizar():
         codigo_clase = ""
 
         if modelo_seleccionado == "keras":
-            # Cargar imagen y procesar con Keras
-            img_pil = Image.open(temp_path).convert('RGB')
+            modelo_keras = get_keras_model()
+
+            img_pil = Image.open(temp_path).convert("RGB")
             entrada = preprocesar_imagen_keras(img_pil)
-            prediccion = keras_model.predict(entrada)
+
+            prediccion = modelo_keras.predict(entrada)
             indice = int(np.argmax(prediccion[0]))
             clase_keras = KERAS_CLASES[indice]
+
             confianza = round(float(prediccion[0][indice]) * 100, 2)
-            
-            # Mapear clase de Keras a código unificado
             codigo_clase = KERAS_MAPPING.get(clase_keras, "cacao_sano")
+
         else:
-            # YOLOv8
-            resultados = yolo_model(temp_path)
+            modelo_yolo = get_yolo_model()
+
+            resultados = modelo_yolo(temp_path)
+
             if len(resultados[0].boxes) == 0:
                 if os.path.exists(temp_path):
                     os.remove(temp_path)
@@ -393,11 +430,10 @@ def analizar():
             box = resultados[0].boxes[0]
             clase_id = int(box.cls[0])
             confianza = round(float(box.conf[0]) * 100, 2)
-            codigo_clase = yolo_model.names[clase_id]
+            codigo_clase = modelo_yolo.names[clase_id]
 
         recomendacion = RECOMENDACIONES.get(codigo_clase, "Revisar el estado del cacao.")
 
-        # Subir a Cloudinary
         upload = cloudinary.uploader.upload(
             temp_path,
             folder=f"cacao-app/usuario_{usuario_id}",
@@ -405,15 +441,15 @@ def analizar():
             overwrite=True,
             resource_type="image"
         )
+
         imagen_url = upload["secure_url"]
         public_id = upload["public_id"]
 
-        # Eliminar archivo temporal local
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
-        # Buscar clasificación correspondiente en base de datos
         clasificacion = Clasificacion.query.filter_by(codigo=codigo_clase).first()
+
         if not clasificacion:
             clasificacion = Clasificacion(
                 codigo=codigo_clase,
@@ -423,7 +459,6 @@ def analizar():
             db.session.add(clasificacion)
             db.session.commit()
 
-        # Guardar análisis en base de datos
         nuevo_analisis = Analisis(
             usuario_id=int(usuario_id),
             clasificacion_id=clasificacion.id,
@@ -433,6 +468,7 @@ def analizar():
             confianza=confianza,
             modelo_usado=modelo_seleccionado
         )
+
         db.session.add(nuevo_analisis)
         db.session.commit()
 
@@ -450,8 +486,10 @@ def analizar():
     except Exception as e:
         if os.path.exists(temp_path):
             os.remove(temp_path)
+
         db.session.rollback()
         print(f"Error al analizar: {e}")
+
         return jsonify({"error": str(e)}), 500
 
 
@@ -477,7 +515,7 @@ def historial(usuario_id):
             "nombre_analisis": d.nombre_analisis,
             "imagen_url": d.imagen_url,
             "confianza": d.confianza,
-            "fecha": d.fecha.strftime('%d/%m/%Y %H:%M'),
+            "fecha": d.fecha.strftime("%d/%m/%Y %H:%M"),
             "modelo_usado": d.modelo_usado or "yolo",
             "codigo": d.codigo,
             "nombre": d.nombre,
@@ -490,18 +528,26 @@ def historial(usuario_id):
 def dashboard(usuario_id):
     total = Analisis.query.filter_by(usuario_id=usuario_id).count()
 
-    # Conteo por clasificación
     conteo_clases = db.session.query(
         Clasificacion.codigo,
         Clasificacion.nombre,
-        func.count(Analisis.id).label('cantidad')
-    ).outerjoin(Analisis, (Clasificacion.id == Analisis.clasificacion_id) & (Analisis.usuario_id == usuario_id))\
-     .group_by(Clasificacion.id, Clasificacion.codigo, Clasificacion.nombre).all()
+        func.count(Analisis.id).label("cantidad")
+    ).outerjoin(
+        Analisis,
+        (Clasificacion.id == Analisis.clasificacion_id) &
+        (Analisis.usuario_id == usuario_id)
+    ).group_by(
+        Clasificacion.id,
+        Clasificacion.codigo,
+        Clasificacion.nombre
+    ).all()
 
     clasificaciones = []
+
     for row in conteo_clases:
         cantidad = row.cantidad
         porcentaje = round((cantidad / total) * 100, 2) if total > 0 else 0
+
         clasificaciones.append({
             "codigo": row.codigo,
             "nombre": row.nombre,
@@ -509,7 +555,6 @@ def dashboard(usuario_id):
             "porcentaje": porcentaje
         })
 
-    # Últimos 3 análisis
     ultimos_rows = db.session.query(
         Analisis.nombre_analisis,
         Analisis.imagen_url,
@@ -525,7 +570,7 @@ def dashboard(usuario_id):
         {
             "nombre_analisis": r.nombre_analisis,
             "imagen_url": r.imagen_url,
-            "fecha": r.fecha.strftime('%d/%m/%Y %H:%M'),
+            "fecha": r.fecha.strftime("%d/%m/%Y %H:%M"),
             "codigo": r.codigo,
             "nombre": r.nombre
         } for r in ultimos_rows
@@ -543,28 +588,43 @@ def reportes(usuario_id):
     fecha_inicio = request.args.get("fecha_inicio")
     fecha_fin = request.args.get("fecha_fin")
 
-    # Total de análisis filtrados
     query_total = Analisis.query.filter_by(usuario_id=usuario_id)
+
     if fecha_inicio and fecha_fin:
-        query_total = query_total.filter(func.date(Analisis.fecha).between(fecha_inicio, fecha_fin))
+        query_total = query_total.filter(
+            func.date(Analisis.fecha).between(fecha_inicio, fecha_fin)
+        )
+
     total = query_total.count()
 
-    # Distribución de tipos de cacao
     query_dist = db.session.query(
         Clasificacion.codigo,
         Clasificacion.nombre,
-        func.count(Analisis.id).label('cantidad')
-    ).outerjoin(Analisis, (Clasificacion.id == Analisis.clasificacion_id) & (Analisis.usuario_id == usuario_id))
-    
-    if fecha_inicio and fecha_fin:
-        query_dist = query_dist.filter((Analisis.id == None) | (func.date(Analisis.fecha).between(fecha_inicio, fecha_fin)))
+        func.count(Analisis.id).label("cantidad")
+    ).outerjoin(
+        Analisis,
+        (Clasificacion.id == Analisis.clasificacion_id) &
+        (Analisis.usuario_id == usuario_id)
+    )
 
-    conteo_clases = query_dist.group_by(Clasificacion.id, Clasificacion.codigo, Clasificacion.nombre).all()
+    if fecha_inicio and fecha_fin:
+        query_dist = query_dist.filter(
+            (Analisis.id == None) |
+            (func.date(Analisis.fecha).between(fecha_inicio, fecha_fin))
+        )
+
+    conteo_clases = query_dist.group_by(
+        Clasificacion.id,
+        Clasificacion.codigo,
+        Clasificacion.nombre
+    ).all()
 
     distribucion = []
+
     for row in conteo_clases:
         cantidad = row.cantidad
         porcentaje = round((cantidad / total) * 100, 2) if total > 0 else 0
+
         distribucion.append({
             "codigo": row.codigo,
             "nombre": row.nombre,
@@ -572,19 +632,27 @@ def reportes(usuario_id):
             "porcentaje": porcentaje
         })
 
-    # Conteo agrupado por fechas para el gráfico
     query_fecha = db.session.query(
-        func.date(Analisis.fecha).label('fecha'),
-        func.count(Analisis.id).label('cantidad')
+        func.date(Analisis.fecha).label("fecha"),
+        func.count(Analisis.id).label("cantidad")
     ).filter(Analisis.usuario_id == usuario_id)
 
     if fecha_inicio and fecha_fin:
-        query_fecha = query_fecha.filter(func.date(Analisis.fecha).between(fecha_inicio, fecha_fin))
+        query_fecha = query_fecha.filter(
+            func.date(Analisis.fecha).between(fecha_inicio, fecha_fin)
+        )
 
-    por_fecha_rows = query_fecha.group_by(func.date(Analisis.fecha)).order_by(func.date(Analisis.fecha)).all()
-    por_fecha = [{"fecha": str(r.fecha), "cantidad": r.cantidad} for r in por_fecha_rows]
+    por_fecha_rows = query_fecha.group_by(
+        func.date(Analisis.fecha)
+    ).order_by(
+        func.date(Analisis.fecha)
+    ).all()
 
-    # Detalles de los análisis para el historial del reporte PDF
+    por_fecha = [
+        {"fecha": str(r.fecha), "cantidad": r.cantidad}
+        for r in por_fecha_rows
+    ]
+
     query_detalles = db.session.query(
         Analisis.id,
         Analisis.nombre_analisis,
@@ -599,16 +667,19 @@ def reportes(usuario_id):
      .filter(Analisis.usuario_id == usuario_id)
 
     if fecha_inicio and fecha_fin:
-        query_detalles = query_detalles.filter(func.date(Analisis.fecha).between(fecha_inicio, fecha_fin))
+        query_detalles = query_detalles.filter(
+            func.date(Analisis.fecha).between(fecha_inicio, fecha_fin)
+        )
 
     detalles_rows = query_detalles.order_by(Analisis.fecha.desc()).all()
+
     detalles = [
         {
             "id": d.id,
             "nombre_analisis": d.nombre_analisis,
             "imagen_url": d.imagen_url,
             "confianza": d.confianza,
-            "fecha": d.fecha.strftime('%d/%m/%Y %H:%M'),
+            "fecha": d.fecha.strftime("%d/%m/%Y %H:%M"),
             "modelo_usado": d.modelo_usado or "yolo",
             "codigo": d.codigo,
             "nombre": d.nombre,
@@ -627,6 +698,7 @@ def reportes(usuario_id):
 @app.route("/api/perfil/<int:usuario_id>", methods=["GET"])
 def obtener_perfil(usuario_id):
     usuario = Usuario.query.get(usuario_id)
+
     if not usuario:
         return jsonify({"error": "Usuario no encontrado"}), 404
 
@@ -638,7 +710,7 @@ def obtener_perfil(usuario_id):
         "correo": usuario.correo,
         "username": usuario.username,
         "foto_perfil_url": usuario.foto_perfil_url,
-        "fecha_registro": usuario.fecha_registro.strftime('%d/%m/%Y'),
+        "fecha_registro": usuario.fecha_registro.strftime("%d/%m/%Y"),
         "cantidad_analisis": total
     })
 
@@ -646,42 +718,47 @@ def obtener_perfil(usuario_id):
 @app.route("/api/perfil/<int:usuario_id>", methods=["PUT"])
 def actualizar_perfil(usuario_id):
     usuario = Usuario.query.get(usuario_id)
+
     if not usuario:
         return jsonify({"error": "Usuario no encontrado"}), 404
 
     data = request.json
+
     usuario.nombre_completo = data.get("nombre_completo", usuario.nombre_completo)
     usuario.correo = data.get("correo", usuario.correo)
     usuario.username = data.get("username", usuario.username)
-    
+
     password = data.get("password")
+
     if password:
         usuario.password = generate_password_hash(password)
 
     db.session.commit()
+
     return jsonify({"mensaje": "Perfil actualizado correctamente"})
 
 
 @app.route("/api/usuarios", methods=["GET"])
 def listar_usuarios():
     usuarios = Usuario.query.order_by(Usuario.id.desc()).all()
+
     return jsonify([
         {
             "id": u.id,
             "nombre_completo": u.nombre_completo,
             "correo": u.correo,
             "username": u.username,
-            "fecha_registro": u.fecha_registro.strftime('%d/%m/%Y')
+            "fecha_registro": u.fecha_registro.strftime("%d/%m/%Y")
         } for u in usuarios
     ])
 
 
-@app.route("/health", methods=["GET"])
-def health():
-    return jsonify({"status": "ok"})
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     with app.app_context():
         inicializar_bd()
-    app.run(debug=True, port=8000)
+
+    app.run(
+        debug=True,
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 8000))
+    )
