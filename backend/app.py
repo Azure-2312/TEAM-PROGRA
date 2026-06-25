@@ -33,7 +33,14 @@ if database_url:
         database_url = database_url.replace("postgres://", "postgresql://", 1)
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 else:
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+    host = os.getenv('DB_HOST', 'localhost')
+    uri = (
+        f"postgresql://{os.getenv('DB_USER', 'postgres')}:{os.getenv('DB_PASSWORD', '')}"
+        f"@{host}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'cacao_detect')}"
+    )
+    if ".render.com" in host:
+        uri += "?sslmode=require"
+    app.config["SQLALCHEMY_DATABASE_URI"] = uri
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
