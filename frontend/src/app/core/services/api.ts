@@ -6,7 +6,14 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class Api {
-  private baseUrl = 'http://localhost:8000/api';
+  private getBaseUrl(): string {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'http://localhost:8000/api';
+    }
+    // TODO: Reemplaza esta URL con el enlace real de tu backend en Render cuando lo crees
+    return 'https://team-progra-backend.onrender.com/api';
+  }
+  private baseUrl = this.getBaseUrl();
 
   constructor(private http: HttpClient) {}
 
