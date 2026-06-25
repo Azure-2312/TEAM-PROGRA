@@ -10,58 +10,82 @@
         <input type="date" [(ngModel)]="fechaFin" (change)="filtrarReportes()" style="padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: #2a2a2a; color: #fff; font-size: 13px;" />
       </div>
 
-      <button actions class="export-btn" (click)="exportarReporte()">
-        Generar Reporte PDF
+      <button actions class="export-btn" (click)="toggleConfigModal(true)">
+        Reporte
       </button>
     </app-page-header>
 
-    <!-- CONFIGURADOR DE EXPORTACIÓN (Premium) -->
-    <div class="export-config-card">
-      <div class="config-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="config-icon">
-          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-        </svg>
-        <h3>Configuración de Reporte Fitosanitario</h3>
-      </div>
-      
-      <div class="config-grid">
-        <div class="config-group">
-          <label>Modo de Reporte</label>
-          <select [(ngModel)]="reportMode" (change)="aplicarFiltroClasificacion()">
-            <option value="general">Resumen Ejecutivo (General)</option>
-            <option value="detailed">Listado Detallado Histórico</option>
-            <option value="alerts">Alertas Fitosanitarias (Plagas y Enfermedades)</option>
-          </select>
-        </div>
+    <!-- MODAL DE CONFIGURACIÓN DE REPORTE (Pop-up) -->
+    @if (showConfigModal) {
+      <div class="modal-backdrop" (click)="toggleConfigModal(false)">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>Configuración del Reporte</h2>
+            <button class="close-modal-btn" (click)="toggleConfigModal(false)">&times;</button>
+          </div>
+          
+          <div class="modal-body">
+            <div class="modal-form-group" style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 6px;">
+              <label class="modal-label" style="font-size: 13.5px; font-weight: 700; color: #4a5568;">Modo de Reporte</label>
+              <select class="modal-select" [(ngModel)]="reportMode" (change)="aplicarFiltroClasificacion()" style="height: 42px; padding: 0 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; background: white; color: #2d3748; font-size: 14px; outline: none; cursor: pointer;">
+                <option value="general">Resumen Ejecutivo (General)</option>
+                <option value="detailed">Listado Detallado Histórico</option>
+                <option value="alerts">Alertas Fitosanitarias (Plagas y Enfermedades)</option>
+              </select>
+            </div>
 
-        <div class="config-group" [style.opacity]="reportMode === 'alerts' ? '0.5' : '1'">
-          <label>Filtrar por Clasificación</label>
-          <select [(ngModel)]="filtroClasificacion" (change)="aplicarFiltroClasificacion()" [disabled]="reportMode === 'alerts'">
-            <option value="todas">Todas las clasificaciones</option>
-            <option value="cacao_sano">Cacao Sano</option>
-            <option value="cacao_moniliasis">Moniliasis</option>
-            <option value="cacao_mazorca_negra">Mazorca Negra</option>
-            <option value="cacao_barrenador">Barrenador de la Mazorca</option>
-            <option value="cacao_mirido">Mírido del Cacao</option>
-          </select>
-        </div>
+            <div class="modal-form-group" [style.opacity]="reportMode === 'alerts' ? '0.5' : '1'" style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px;">
+              <label class="modal-label" style="font-size: 13.5px; font-weight: 700; color: #4a5568;">Filtrar por Clasificación</label>
+              <div class="classifications-checkbox-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #edf2f7;">
+                <label class="check-option" style="grid-column: 1 / span 2; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #2d3748; cursor: pointer;">
+                  <input type="checkbox" [(ngModel)]="todasSeleccionadas" (change)="onTodasClasificacionesChange()" [disabled]="reportMode === 'alerts'" style="width: 16px; height: 16px; accent-color: #347d2b;" />
+                  <span>Todas las clasificaciones</span>
+                </label>
+                <label class="check-option" style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #4a5568; cursor: pointer;">
+                  <input type="checkbox" [(ngModel)]="seleccionClasificaciones['cacao_sano']" (change)="onClasificacionChange()" [disabled]="reportMode === 'alerts'" style="width: 16px; height: 16px; accent-color: #347d2b;" />
+                  <span>Cacao Sano</span>
+                </label>
+                <label class="check-option" style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #4a5568; cursor: pointer;">
+                  <input type="checkbox" [(ngModel)]="seleccionClasificaciones['cacao_moniliasis']" (change)="onClasificacionChange()" [disabled]="reportMode === 'alerts'" style="width: 16px; height: 16px; accent-color: #347d2b;" />
+                  <span>Moniliasis</span>
+                </label>
+                <label class="check-option" style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #4a5568; cursor: pointer;">
+                  <input type="checkbox" [(ngModel)]="seleccionClasificaciones['cacao_mazorca_negra']" (change)="onClasificacionChange()" [disabled]="reportMode === 'alerts'" style="width: 16px; height: 16px; accent-color: #347d2b;" />
+                  <span>Mazorca Negra</span>
+                </label>
+                <label class="check-option" style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #4a5568; cursor: pointer;">
+                  <input type="checkbox" [(ngModel)]="seleccionClasificaciones['cacao_barrenador']" (change)="onClasificacionChange()" [disabled]="reportMode === 'alerts'" style="width: 16px; height: 16px; accent-color: #347d2b;" />
+                  <span>Barrenador</span>
+                </label>
+                <label class="check-option" style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #4a5568; cursor: pointer;">
+                  <input type="checkbox" [(ngModel)]="seleccionClasificaciones['cacao_mirido']" (change)="onClasificacionChange()" [disabled]="reportMode === 'alerts'" style="width: 16px; height: 16px; accent-color: #347d2b;" />
+                  <span>Mírido del Cacao</span>
+                </label>
+              </div>
+            </div>
 
-        <div class="config-checkboxes">
-          <label class="check-option">
-            <input type="checkbox" [(ngModel)]="includeCover" />
-            <span>Incluir portada formal</span>
-          </label>
-          <label class="check-option">
-            <input type="checkbox" [(ngModel)]="includeCharts" />
-            <span>Incluir gráficos estadísticos</span>
-          </label>
-          <label class="check-option">
-            <input type="checkbox" [(ngModel)]="includeRecommendations" />
-            <span>Incluir guía de recomendaciones</span>
-          </label>
+            <div class="modal-form-group" style="display: flex; flex-direction: column; gap: 6px;">
+              <label class="modal-label" style="font-size: 13.5px; font-weight: 700; color: #4a5568;">Guía Agronómica</label>
+              <div class="options-checkboxes" style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #edf2f7;">
+                <label class="check-option" style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #4a5568; cursor: pointer;">
+                  <input type="checkbox" [(ngModel)]="includeRecommendations" style="width: 16px; height: 16px; accent-color: #347d2b;" />
+                  <span>Incluir guía de recomendaciones detalladas</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer" style="padding: 14px 20px; border-top: 1px solid #edf2f7; display: flex; justify-content: flex-end; gap: 10px; background: #fafafa;">
+            <button class="btn-modal-cancel" (click)="toggleConfigModal(false)" style="height: 38px; padding: 0 18px; border: 1.5px solid #cbd5e0; border-radius: 8px; background: white; color: #4a5568; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: background 0.2s;">
+              Cancelar
+            </button>
+            <button class="btn-modal-generate" (click)="exportarReporte()" style="height: 38px; padding: 0 18px; border: none; border-radius: 8px; background: #347d2b; color: white; font-size: 13.5px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 6px rgba(52, 125, 43, 0.2); transition: background 0.2s;">
+              Generar Reporte PDF
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    }
 
     <section class="stats">
       <app-stat-card
@@ -327,6 +351,7 @@
     </div>
 
     <!-- PÁGINA FINAL: RECOMENDACIONES AGRONÓMICAS -->
+    <!-- PÁGINA FINAL: RECOMENDACIONES AGRONÓMICAS -->
     <div class="print-page print-recommendations" *ngIf="includeRecommendations">
       <div class="report-page-header">
         <div class="header-left">CacaoDetect - Guía Agronómica</div>
@@ -350,16 +375,36 @@
         <p><strong>Acciones Recomendadas:</strong> Asegurar un drenaje de agua eficiente en el suelo para reducir la humedad ambiental. Recoger mazorcas momificadas en las ramas o el suelo y destruirlas. Si la incidencia es alta, evaluar la aplicación localizada de fungicidas a base de cobre en el inicio de la época de lluvias.</p>
       </div>
 
-      <div class="rec-section-item">
+      <div class="rec-section-item" style="border-bottom: none;">
         <h3>🐛 Barrenador de la Mazorca (*Carmenta theobromae*)</h3>
         <p><strong>Síntomas:</strong> Agujeros pequeños en la corteza de la mazorca acompañado de serrín y pudrición interna severa generada por la larva.</p>
         <p><strong>Acciones Recomendadas:</strong> Implementar control etológico (trampas de luz y feromonas). Eliminar frutos barrenados e infectados de inmediato para cortar el ciclo de vida del insecto. Mantener el cultivo libre de malezas hospederas.</p>
       </div>
+    </div>
 
-      <div class="rec-section-item" style="border-bottom: none; margin-top: 30px;">
-        <h3>⚠️ Descargo de Responsabilidad</h3>
-        <p style="font-size: 10px; color: #666; font-style: italic; line-height: 1.4;">
-          El presente informe ha sido emitido con fines orientativos y educativos basándose en clasificaciones probabilísticas de Inteligencia Artificial (modelos YOLOv8 y EfficientNet). Toda acción correctiva de gran envergadura o aplicación de agroquímicos debe ser previamente validada por un ingeniero agrónomo profesional en el campo.
+    <!-- PÁGINA FINAL: AVISOS Y DESCARGO DE RESPONSABILIDAD (Siempre se incluye) -->
+    <div class="print-page print-disclaimer">
+      <div class="report-page-header">
+        <div class="header-left">CacaoDetect - Información Legal y Descargo</div>
+        <div class="header-right">Fecha de Emisión: {{ fechaActual }}</div>
+      </div>
+      
+      <h2>Avisos sobre Lectura y Descargo de Responsabilidad</h2>
+      <div class="disclaimer-content" style="border: 2px solid #cbd5e0; padding: 18px; border-radius: 8px; background: #fafafa; margin-top: 15px;">
+        <h3 style="color: #c53030; font-size: 11pt; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-weight: 700;">
+          ⚠️ Posibilidad de Fallos en la Lectura de la Inteligencia Artificial
+        </h3>
+        <p style="font-size: 9.5pt; color: #2d3748; line-height: 1.5; margin-bottom: 10px; text-align: left;">
+          El sistema <strong>CacaoDetect</strong> utiliza algoritmos avanzados de visión artificial e Inteligencia Artificial (redes YOLOv8 y EfficientNet) para clasificar y diagnosticar mazorcas de cacao. No obstante, al tratarse de modelos probabilísticos basados en análisis visual, existe la posibilidad de que ocurran lecturas incorrectas (falsos positivos o falsos negativos) debido a los siguientes factores de interferencia:
+        </p>
+        <ul style="font-size: 9pt; color: #4a5568; line-height: 1.45; margin-left: 20px; margin-bottom: 12px; text-align: left;">
+          <li style="margin-bottom: 3px;">Condiciones de iluminación deficientes (sombras fuertes, reflejos de luz directa o contraluz).</li>
+          <li style="margin-bottom: 3px;">Presencia de elementos externos en la corteza de la mazorca (polvo denso, barro, agua, insectos o telarañas).</li>
+          <li style="margin-bottom: 3px;">Capturas con enfoque borroso, movimiento, baja resolución de cámara o distancia inadecuada.</li>
+          <li style="margin-bottom: 3px;">Infecciones atípicas o en etapas de desarrollo extremadamente tempranas que no presenten signos visibles evidentes.</li>
+        </ul>
+        <p style="font-size: 9pt; color: #718096; font-style: italic; line-height: 1.45; border-top: 1px solid #e2e8f0; padding-top: 10px; margin-top: 10px; text-align: left;">
+          <strong>Nota de descargo:</strong> Este informe es de carácter estrictamente informativo y de soporte a la toma de decisiones. Las intervenciones agrícolas críticas, tratamientos extensivos o aplicación masiva de fitofármacos deben ser previamente contrastados e inspeccionados directamente en el campo por un ingeniero agrónomo titulado.
         </p>
       </div>
     </div>

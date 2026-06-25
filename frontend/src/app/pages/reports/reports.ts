@@ -41,11 +41,20 @@ export class Reports implements OnInit {
   usuarioId: number = 1;
 
   // Parámetros de configuración del Reporte PDF
+  showConfigModal: boolean = false;
   reportMode: string = 'general';  // 'general' | 'detailed' | 'alerts'
-  filtroClasificacion: string = 'todas';
   includeCover: boolean = true;
   includeCharts: boolean = true;
   includeRecommendations: boolean = true;
+
+  seleccionClasificaciones: { [key: string]: boolean } = {
+    cacao_sano: true,
+    cacao_moniliasis: true,
+    cacao_mazorca_negra: true,
+    cacao_barrenador: true,
+    cacao_mirido: true
+  };
+  todasSeleccionadas: boolean = true;
 
   analisisDetallados: any[] = [];
   filteredDetalles: any[] = [];
@@ -135,24 +144,50 @@ export class Reports implements OnInit {
   }
 
   exportarReporte() {
+    this.showConfigModal = false;
     this.cdr.detectChanges();
     setTimeout(() => {
       window.print();
-    }, 100);
+    }, 150);
   }
 
   aplicarFiltroClasificacion() {
-    if (this.filtroClasificacion === 'todas') {
-      // Si el modo es alertas, filtrar solo los enfermos
-      if (this.reportMode === 'alerts') {
-        this.filteredDetalles = this.analisisDetallados.filter(d => d.codigo !== 'cacao_sano');
-      } else {
-        this.filteredDetalles = this.analisisDetallados;
+    this.filteredDetalles = this.analisisDetallados.filter(d => {
+      if (this.reportMode === 'alerts' && d.codigo === 'cacao_sano') {
+        return false;
       }
-    } else {
-      this.filteredDetalles = this.analisisDetallados.filter(d => d.codigo === this.filtroClasificacion);
-    }
+      return this.seleccionClasificaciones[d.codigo] === true;
+    });
     this.cdr.detectChanges();
+  }
+
+  toggleConfigModal(show: boolean): void {
+    this.showConfigModal = show;
+    this.cdr.detectChanges();
+  }
+
+  onTodasClasificacionesChange(): void {
+    const keys = Object.keys(this.seleccionClasificaciones);
+    keys.forEach(k => {
+      this.seleccionClasificaciones[k] = this.todasSeleccionadas;
+    });
+    this.aplicarFiltroClasificacion();
+  }
+
+  onClasificacionChange(): void {
+    const keys = Object.keys(this.seleccionClasificaciones);
+    this.todasSeleccionadas = keys.every(k => this.seleccionClasificaciones[k] === true);
+    this.aplicarFiltroClasificacion();
+  }
+
+  get filtroClasificacion(): string {
+    if (this.todasSeleccionadas) {
+      return 'todas';
+    }
+    const clasesMarcadas = Object.keys(this.seleccionClasificaciones)
+      .filter(k => this.seleccionClasificaciones[k])
+      .map(k => k.replace('cacao_', '').replace('_', ' ').toUpperCase());
+    return clasesMarcadas.join(', ') || 'ninguno';
   }
 
   get nombreUsuarioLogueado(): string {

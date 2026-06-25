@@ -343,3 +343,20 @@
     background: #c53030;
   }
 }
+
+@media (max-width: 768px) {
+  .analyze-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .model-selector-container {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    
+    select {
+      width: 100% !important;
+    }
+  }
+}

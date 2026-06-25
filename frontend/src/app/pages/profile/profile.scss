@@ -127,3 +127,19 @@
   border-radius: 8px;
   border-left: 4px solid #10b981;
 }
+
+@media (max-width: 768px) {
+  .main-content {
+    align-items: flex-start !important;
+  }
+  .profile-card {
+    max-height: none !important;
+    padding: 20px 24px !important;
+    border-radius: 16px !important;
+    
+    h1 {
+      font-size: 26px !important;
+      margin-bottom: 16px !important;
+    }
+  }
+}

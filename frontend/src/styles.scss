@@ -14,3 +14,28 @@ body {
 body {
   overflow: hidden;
 }
+
+@media (max-width: 768px) {
+  html,
+  body {
+    overflow: auto !important;
+    height: auto !important;
+  }
+
+  .dashboard-page,
+  .analyze-page,
+  .history-page,
+  .reports-page,
+  .profile-page {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+    min-height: 100vh;
+    overflow: visible !important;
+  }
+
+  .main-content {
+    padding: 16px 12px 60px !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+}

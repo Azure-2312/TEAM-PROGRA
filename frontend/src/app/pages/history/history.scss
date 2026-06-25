@@ -101,3 +101,28 @@ td img {
 .clickable-row:hover {
   background: #f7f7f5;
 }
+
+@media (max-width: 768px) {
+  .filters {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    
+    input, select {
+      height: 46px !important;
+      font-size: 14px !important;
+    }
+  }
+
+  .table-card {
+    overflow-x: auto !important;
+    
+    table {
+      min-width: 600px !important;
+    }
+    
+    th, td {
+      padding: 12px 14px !important;
+      font-size: 14px !important;
+    }
+  }
+}
