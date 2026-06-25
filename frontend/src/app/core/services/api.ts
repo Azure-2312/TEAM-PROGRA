@@ -6,7 +6,13 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class Api {
-  private baseUrl = 'https://team-cacaodetect-backend.onrender.com/api';
+  private getBaseUrl(): string {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'http://localhost:8000/api';
+    }
+    return 'https://team-cacaodetect-backend.onrender.com/api';
+  }
+  private baseUrl = this.getBaseUrl();
 
   constructor(private http: HttpClient) {}
 
