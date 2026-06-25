@@ -121,12 +121,27 @@ export class Analyze implements OnInit, OnDestroy {
 
   setTab(tab: 'upload' | 'camera'): void {
     this.activeTab = tab;
+    this.selectedFile = null;
+    this.selectedImage = null;
+    this.isAnalyzed = false;
+    this.resultado = null;
+    this.errorMsg = '';
+    
     if (tab === 'upload') {
       this.stopCamera();
     } else {
       this.startCamera();
     }
     this.cdr.detectChanges();
+  }
+
+  retakePhoto(): void {
+    this.selectedFile = null;
+    this.selectedImage = null;
+    this.isAnalyzed = false;
+    this.resultado = null;
+    this.errorMsg = '';
+    this.startCamera();
   }
 
   startCamera(): void {

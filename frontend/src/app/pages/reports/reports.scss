@@ -252,6 +252,13 @@
 }
 
 @media print {
+  .reports-page {
+    display: block !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    background: #fff !important;
+  }
+
   @page {
     size: A4 portrait;
     margin: 15mm 12mm 15mm 12mm;

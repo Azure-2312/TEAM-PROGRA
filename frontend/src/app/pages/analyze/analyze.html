@@ -91,16 +91,22 @@
 
               @if (!isAnalyzed && !loading) {
                 <div class="preview-actions">
-                  <input
-                    type="file"
-                    #fileInput
-                    accept="image/png, image/jpeg"
-                    hidden
-                    (change)="onChangeImageSelected($event)"
-                  />
-                  <button class="change-btn" (click)="fileInput.click()">
-                    Cambiar imagen
-                  </button>
+                  @if (activeTab === 'upload') {
+                    <input
+                      type="file"
+                      #fileInput
+                      accept="image/png, image/jpeg"
+                      hidden
+                      (change)="onChangeImageSelected($event)"
+                    />
+                    <button class="change-btn" (click)="fileInput.click()">
+                      Cambiar imagen
+                    </button>
+                  } @else {
+                    <button class="change-btn" (click)="retakePhoto()">
+                      Tomar otra foto
+                    </button>
+                  }
 
                   <button class="analyze-btn" (click)="analyzeImage()">
                     Analizar cacao
