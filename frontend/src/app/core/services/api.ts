@@ -10,7 +10,7 @@ export class Api {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       return 'http://localhost:8000/api';
     }
-    return 'https://team-cacaodetect-backend.onrender.com/api';
+    return 'https://team-progra.onrender.com/api';
   }
   private baseUrl = this.getBaseUrl();
 
