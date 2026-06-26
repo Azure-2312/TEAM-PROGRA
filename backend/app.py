@@ -14,8 +14,7 @@ from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
 import cloudinary
 import cloudinary.uploader
-import numpy as np
-from PIL import Image
+import requests
 from sqlalchemy import func, Date, cast
 
 from models import db, Usuario, Clasificacion, Analisis, CodigoRecuperacion
@@ -53,11 +52,18 @@ cloudinary.config(
 )
 
 # =========================
-# MODELOS BAJO DEMANDA
+# CONFIGURACIÓN DE MODELOS (HUGGING FACE SPACES)
 # =========================
 
-yolo_model = None
-keras_model = None
+EFFICIENTNET_URL = os.getenv(
+    "EFFICIENTNET_URL",
+    "https://laun-26-cacaodetect-efficientnet.hf.space/predecir"
+)
+YOLO_URL = os.getenv(
+    "YOLO_URL",
+    "https://laun-26-cacaodetect-yolo.hf.space/detectar"
+)
+
 bd_inicializada = False
 
 KERAS_CLASES = ["Fito", "Monilia", "Sana"]
@@ -75,71 +81,6 @@ RECOMENDACIONES = {
     "cacao_moniliasis": "Se recomienda eliminar frutos infectados y mejorar la ventilación del cultivo para disminuir la humedad.",
     "cacao_sano": "Producto apto visualmente. El cacao se encuentra en buen estado."
 }
-
-
-def reparar_modelo_h5(ruta_modelo):
-    import h5py
-    import json
-
-    with h5py.File(ruta_modelo, "r+") as f:
-        config = f.attrs.get("model_config")
-
-        if config is None:
-            return
-
-        if isinstance(config, bytes):
-            config = config.decode("utf-8")
-
-        config_json = json.loads(config)
-
-        def limpiar_quantization(obj):
-            if isinstance(obj, dict):
-                obj.pop("quantization_config", None)
-                for valor in obj.values():
-                    limpiar_quantization(valor)
-            elif isinstance(obj, list):
-                for item in obj:
-                    limpiar_quantization(item)
-
-        limpiar_quantization(config_json)
-        f.attrs.modify("model_config", json.dumps(config_json))
-
-
-def get_yolo_model():
-    global yolo_model
-
-    if yolo_model is None:
-        from ultralytics import YOLO
-        yolo_model = YOLO("best.pt")
-
-    return yolo_model
-
-
-def get_keras_model():
-    global keras_model
-
-    if keras_model is None:
-        import tensorflow as tf
-
-        modelo_keras_path = "efficientnet_cacao_v2.h5"
-        reparar_modelo_h5(modelo_keras_path)
-
-        keras_model = tf.keras.models.load_model(
-            modelo_keras_path,
-            compile=False
-        )
-
-    return keras_model
-
-
-def preprocesar_imagen_keras(imagen_pil):
-    import tensorflow as tf
-
-    imagen = imagen_pil.resize((224, 224))
-    arr = np.array(imagen, dtype=np.float32)
-    arr = tf.keras.applications.efficientnet.preprocess_input(arr)
-    arr = np.expand_dims(arr, axis=0)
-    return arr
 
 
 def inicializar_bd():
@@ -408,36 +349,62 @@ def analizar():
     imagen.save(temp_path)
 
     try:
-        confianza = 0.0
-        codigo_clase = ""
-
         if modelo_seleccionado == "keras":
-            modelo_keras = get_keras_model()
+            with open(temp_path, "rb") as f:
+                files = {"file": (f"image_{nombre_analisis}.jpg", f, "image/jpeg")}
+                response = requests.post(EFFICIENTNET_URL, files=files, timeout=30)
 
-            img_pil = Image.open(temp_path).convert("RGB")
-            entrada = preprocesar_imagen_keras(img_pil)
+            if response.status_code == 503:
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+                return jsonify({"error": "El servidor de modelo de Hugging Face (EfficientNet) está iniciando. Por favor, intente nuevamente en unos minutos."}), 503
 
-            prediccion = modelo_keras.predict(entrada)
-            indice = int(np.argmax(prediccion[0]))
-            clase_keras = KERAS_CLASES[indice]
+            if response.status_code != 200:
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+                return jsonify({"error": f"Error del servidor de modelo: {response.text}"}), response.status_code
 
-            confianza = round(float(prediccion[0][indice]) * 100, 2)
+            res_json = response.json()
+            pred_clase_idx = res_json.get("prediccion_clase")
+            probabilidades = res_json.get("probabilidades")
+
+            if pred_clase_idx is None or probabilidades is None:
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+                return jsonify({"error": "Respuesta inválida del servidor de modelo"}), 500
+
+            clase_keras = KERAS_CLASES[pred_clase_idx]
+            confianza = round(float(probabilidades[pred_clase_idx]) * 100, 2)
             codigo_clase = KERAS_MAPPING.get(clase_keras, "cacao_sano")
 
         else:
-            modelo_yolo = get_yolo_model()
+            with open(temp_path, "rb") as f:
+                files = {"file": (f"image_{nombre_analisis}.jpg", f, "image/jpeg")}
+                response = requests.post(YOLO_URL, files=files, timeout=30)
 
-            resultados = modelo_yolo(temp_path)
+            if response.status_code == 503:
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+                return jsonify({"error": "El servidor de modelo de Hugging Face (YOLO) está iniciando. Por favor, intente nuevamente en unos minutos."}), 503
 
-            if len(resultados[0].boxes) == 0:
+            if response.status_code != 200:
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+                return jsonify({"error": f"Error del servidor de modelo: {response.text}"}), response.status_code
+
+            res_json = response.json()
+            total_detectado = res_json.get("total_detectado", 0)
+            resultados = res_json.get("resultados", [])
+
+            if total_detectado == 0 or len(resultados) == 0:
                 if os.path.exists(temp_path):
                     os.remove(temp_path)
                 return jsonify({"error": "No se detectó cacao en la imagen"}), 400
 
-            box = resultados[0].boxes[0]
-            clase_id = int(box.cls[0])
-            confianza = round(float(box.conf[0]) * 100, 2)
-            codigo_clase = modelo_yolo.names[clase_id]
+            box = resultados[0]
+            clase_nombre = box.get("nombre")
+            confianza = round(float(box.get("confianza", 0.0)) * 100, 2)
+            codigo_clase = clase_nombre
 
         recomendacion = RECOMENDACIONES.get(codigo_clase, "Revisar el estado del cacao.")
 

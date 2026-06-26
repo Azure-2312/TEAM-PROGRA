@@ -22,3 +22,8 @@ dbeaver-light.properties
 # Archivos de IDE
 .vscode/
 .idea/
+
+# Modelos de Machine Learning
+*.pt
+*.h5
+*.onnx
